@@ -1,153 +1,214 @@
 # Local Service Hub
-> **Find Trusted Local Professionals Near You (Maithon Dam & border Bengal-Jharkhand regions)**
 
-Local Service Hub is a robust, secure, and production-ready local marketplace application designed to connect local service providers (electricians, plumbers, AC technicians, carpenters, etc.) with local customers. The application is built using a layered Node.js architecture with MySQL/Sequelize, and separate Angular v19 SPA interfaces for consumers/partners and administrative control.
+> A full-stack, double-sided local service marketplace (Urban Company / Housejoy style) connecting customers with verified local service professionals across Maithon Dam, Dhanbad, and surrounding West Bengal–Jharkhand border areas.
 
 ---
 
-## 🏗️ Project Architecture
+## 📌 Project Overview
 
-The codebase follows a professional layered MVC-style structure to ensure clean separation of concerns and database security:
+**Local Service Hub** solves the challenge of finding trustworthy local technicians (electricians, plumbers, AC mechanics, carpenters, cleaners) in tier-2/3 regions. It offers standardized service pricing, real-time booking status updates, instant Socket.io chat, admin KYC validation, and multi-tier monetization for platform admins.
+
+The project is built as a monorepo containing:
+- **Backend API Server**: Node.js, Express, Sequelize ORM, MySQL, and Socket.io.
+- **Customer & Provider Portal**: Angular v19 SPA (`frontend_userSide`).
+- **Admin Control Panel**: Angular v19 SPA (`frontend_admin_panel`).
+
+---
+
+## 🛠️ Tech Stack & Key Libraries
+
+### Backend
+- **Runtime & Framework**: Node.js, Express.js
+- **Database & ORM**: MySQL, Sequelize ORM
+- **Real-Time Communication**: Socket.io (room-based chat, typing states, read receipts)
+- **Security & Auth**: JWT (Access + httpOnly Refresh Cookies), BCrypt.js, Helmet, Express Rate Limit, Express Validator
+- **File Storage**: Multer (profile photos, Aadhaar/PAN KYC documents, service media)
+
+### Frontend (Customer & Admin Portals)
+- **Framework**: Angular v19 (Standalone Components, Signals, Reactive Forms, RxJS)
+- **Real-Time Integration**: `socket.io-client`
+- **Styling**: Modern CSS design system (Dark mode, glassmorphism, responsive grid)
+
+---
+
+## 📁 Repository Structure
 
 ```
 Maithon_service_project/
-├── backend/
-│   ├── config/          # Sequelize database connection & JWT keys config
-│   ├── controllers/     # Auth, booking, customer, provider & admin route handlers
-│   ├── middlewares/     # verifyToken guards, global error interception, Multer uploads
-│   ├── models/          # Sequelize database models definition & associations index
-│   ├── routes/          # Express API route maps
-│   ├── scripts/         # sync.js database creation & seeding script
-│   ├── utils/           # Console coloring logger utility
-│   ├── uploads/         # Sub-folder segregated uploads (profiles, documents, services)
-│   ├── .env             # Port, DB credentials & JWT keys config variables
-│   └── server.js        # Express application entry-point
-├── frontend_userSide/   # Angular Customer & Service Provider App
-└── frontend_admin_panel/# Angular Administrative Control Center Dashboard
+├── backend/                  # Express REST API & Socket.io server
+│   ├── config/               # Database connection & JWT configurations
+│   ├── controllers/          # Business logic handlers (auth, booking, chat, admin, etc.)
+│   ├── middlewares/          # Auth guards, role validation, file uploaders, error handlers
+│   ├── models/               # Sequelize schemas & association mapping
+│   ├── routes/               # API route maps
+│   ├── scripts/              # DB sync & seed scripts
+│   ├── uploads/              # Uploaded media (KYC docs, avatars, gallery)
+│   ├── utils/                # Custom logger & utilities
+│   └── server.js             # Server entry point & WebSocket handlers
+├── frontend_userSide/        # Angular 19 SPA for Customers & Service Providers
+│   └── src/app/
+│       ├── core/             # Auth services, HTTP interceptors, guards
+│       └── features/         # Auth, Home, Customer Portal, Provider Portal, Real-time Chat
+├── frontend_admin_panel/     # Angular 19 SPA for System Administrators
+│   └── src/app/
+│       ├── core/             # Admin auth & core services
+│       └── features/         # Dashboard, Providers, Bookings, Categories, Subscriptions, Settings
+├── scripts/                  # Helper scripts (kill-port utility)
+├── business_and_operation_guide.md # Monetization & operational breakdown
+├── pitches_guide.md          # Pitch decks & strategy guide
+└── README.md                 # Project documentation
 ```
 
 ---
 
-## 🔌 API Documentation List
+## 🔑 Key Features
 
-All requests must set `Content-Type: application/json`. Protected endpoints require `Authorization: Bearer <JWT_Token>`.
+### 👤 Customer Features
+- **Location-Based Search**: Search local technicians by city, pincode, area, and service category.
+- **Transparent Catalog**: Standardized service rates to prevent on-site bargaining disputes.
+- **Booking Management**: Book preferred date and time slots with real-time status tracking (`Pending` → `Accepted` → `In Progress` → `Completed`).
+- **Instant Messaging**: Socket.io real-time chat with service providers including image attachments.
+- **Ratings & Reviews**: Submit 1–5 star reviews upon service completion.
+- **Favorites & Saved Providers**: Bookmark trusted technicians for quick re-booking.
 
-### 🔑 Authentication Module (`/api/auth`)
-*   `POST /register` - Registers a new user. Role must be `Customer` or `Provider`.
-*   `POST /login` - Log in to get JWT token. Refresh token is delivered inside an httpOnly cookie.
-*   `POST /refresh` - Auto-renew access token using the refresh cookie.
-*   `POST /logout` - Wipe tokens and clear secure cookies.
-*   `POST /change-password` - Update password (Protected).
+### 👷 Service Provider Features
+- **Provider Onboarding**: Profile registration with business details, working hours, and pricing lists.
+- **KYC Verification**: Upload Aadhaar and PAN card documents for admin verification badge.
+- **Availability Toggle**: Switch status between `Available`, `Busy`, and `Offline`.
+- **Job Management**: Accept or reject incoming service booking requests.
+- **Earnings & Reviews**: Track completed jobs, overall earnings, and customer reviews.
+- **Subscription Packages**: Subscribe to monthly packages for boosted visibility and lower commission rates.
 
-### 🛠️ Admin Module (`/api/admin`)
-*   `GET /dashboard` - Fetchplatform statistics (Revenue, providers kyc count, bookings logs).
-*   `GET /users` - Paginated and filtered lists of all users.
-*   `PUT /users/:id/status` - Suspend/Activate user accounts.
-*   `POST /create-admin` - Register a new Administrator dynamically (Admin Only).
-*   `GET /providers` - List all service providers.
-*   `PUT /providers/:id/verify` - Approve (`Verified`) or reject (`Rejected`) a provider's KYC documents.
-*   `POST /locations/cities` - Add a new city.
-*   `POST /locations/areas` - Add a new area (with pincode) linked to a city.
-*   `GET /support` - List user query tickets.
-*   `PUT /support/:id/resolve` - Mark queries as resolved.
-
-### 👥 Customer Module (`/api/customers`)
-*   `GET /profile` - Retrieve self profile.
-*   `PUT /profile` - Update profile address / upload profile avatar picture.
-*   `GET /providers/search` - Search providers with category, city, area and name filters.
-*   `GET /providers/:id` - Detailed provider catalog page with reviews history.
-*   `POST /favorites` - Add/Remove providers to favorites.
-*   `GET /favorites` - Retrieve customer favorites list.
-*   `POST /reviews` - Submit a 1-5 star review for a completed service booking.
-*   `POST /support` - Submit a contact message (Public).
-
-### 👷 Provider Module (`/api/providers`)
-*   `GET /profile` - Get business profile specs.
-*   `PUT /profile` - Update business details (pricing, experience, skills lists).
-*   `POST /kyc` - Upload Aadhaar/PAN card file attachments.
-*   `POST /availability` - Switch online presence status (`Available`, `Busy`, `Offline`).
-*   `GET /dashboard` - Fetch provider's earnings and review logs.
-*   `GET /bookings` - Fetch list of assigned booking requests.
-
-### 📅 Bookings Module (`/api/bookings`)
-*   `POST /` - Create a booking request (Customer only).
-*   `GET /history/customer` - Retrieve bookings log (Customer only).
-*   `GET /:id` - Get details of a single booking.
-*   `PUT /:id/status` - Update booking status (`Accepted`, `Rejected`, `Completed`, `Cancelled`).
+### 👑 Admin Control Panel
+- **KYC Validation Queue**: Review provider identity documents and approve or reject verification applications.
+- **User & Provider Management**: Activate, suspend, or manage platform accounts.
+- **Service Catalog Builder**: Manage service categories, base pricing, duration, and required tools.
+- **Location Management**: Define operational cities, areas, and pincodes.
+- **Real-Time Booking Monitoring**: Track platform-wide bookings and swap/assign handlers when needed.
+- **CMS & Dynamic Branding**: Customize home page hero titles, features list, workflow steps, and policies directly from the admin panel.
+- **Support System**: Manage and resolve user support ticket inquiries.
 
 ---
 
-## ⚡ Installation & Execution Guide
+## 🔌 API Reference Summary
 
-### 1. Prerequisites
-*   **Node.js** (v18 or higher recommended)
-*   **MySQL Server** (make sure it is running locally on port `3306`)
+Base URL: `http://localhost:5000/api`
 
-### 2. Configure Environment Variables
-Navigate to `backend/.env` and update the database settings:
+### 🔐 Authentication (`/api/auth`)
+- `POST /api/auth/register` — Register as Customer or Provider
+- `POST /api/auth/login` — Authenticate and receive JWT access token + refresh cookie
+- `POST /api/auth/refresh` — Renew access token via refresh token cookie
+- `POST /api/auth/logout` — Revoke session and clear cookies
+- `POST /api/auth/change-password` — Password update (Protected)
+
+### 👥 Customer (`/api/customers`)
+- `GET /api/customers/profile` — Fetch current customer profile
+- `PUT /api/customers/profile` — Update address, city, area, avatar
+- `GET /api/customers/providers/search` — Search providers with filters
+- `GET /api/customers/providers/:id` — View detailed provider catalog & reviews
+- `POST /api/customers/favorites` — Toggle favorite provider
+- `GET /api/customers/favorites` — List saved providers
+- `POST /api/customers/reviews` — Submit booking review
+
+### 👷 Provider (`/api/providers`)
+- `GET /api/providers/profile` — Fetch business details
+- `PUT /api/providers/profile` — Update pricing, skills, working hours
+- `POST /api/providers/kyc` — Upload Aadhaar/PAN documents
+- `POST /api/providers/availability` — Toggle online status
+- `GET /api/providers/dashboard` — Earnings and analytics
+- `GET /api/providers/bookings` — Assigned bookings list
+
+### 📅 Bookings (`/api/bookings`)
+- `POST /api/bookings` — Create a new service booking request
+- `GET /api/bookings/history/customer` — Customer booking history
+- `GET /api/bookings/:id` — Single booking breakdown
+- `PUT /api/bookings/:id/status` — Update status (`Accepted`, `Completed`, `Cancelled`)
+
+### 💬 Real-Time Chat (`/api/chat`)
+- `GET /api/chat/conversations` — List active user chat rooms
+- `GET /api/chat/messages/:roomId` — Fetch message history for room
+- `POST /api/chat/upload` — Upload chat image attachment
+
+### 🛠️ Admin (`/api/admin`)
+- `GET /api/admin/dashboard` — Platform overview stats and revenue logs
+- `GET /api/admin/providers` — List providers for verification
+- `PUT /api/admin/providers/:id/verify` — Approve or reject provider KYC
+- `PUT /api/admin/users/:id/status` — Activate/Suspend user account
+- `POST /api/admin/locations/cities` — Create operational city
+- `POST /api/admin/locations/areas` — Create area linked to city with pincode
+
+---
+
+## ⚡ Local Setup & Execution Guide
+
+### Prerequisites
+- **Node.js** (v18+)
+- **MySQL Server** (Running on port `3306`)
+
+### 1. Database Setup
+Create MySQL database:
+```sql
+CREATE DATABASE maithon_service_db;
+```
+
+### 2. Configure Backend Environment
+Edit `backend/.env`:
 ```env
 PORT=5000
 NODE_ENV=development
 
-# Database Settings
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_mysql_password
 DB_NAME=maithon_service_db
 
-# Secrets keys
 JWT_SECRET=maithon_local_service_hub_access_secret_key_2026
 JWT_REFRESH_SECRET=maithon_local_service_hub_refresh_secret_key_2026
-JWT_EXPIRATION=900          # 15 mins
-JWT_REFRESH_EXPIRATION=86400 # 24 hrs
+JWT_EXPIRATION=900
+JWT_REFRESH_EXPIRATION=86400
 ```
 
-### 3. Initialize Database & Seed Demo Data
-Open your MySQL client or CLI and create the database schema:
-```sql
-CREATE DATABASE maithon_service_db;
-```
-
-Run the database synchronization and seeding script:
+Seed database tables and demo data:
 ```bash
 cd backend
 npm run db:sync
 ```
-*This command drops existing tables, creates the schema with proper constraints, and seeds:*
-*   Roles (`Admin`, `Provider`, `Customer`).
-*   Super Admin credentials: `admin@localservice.com` / `Admin@123`.
-*   Locations (Dhanbad, Paschim Bardhaman with areas Maithon Dam, Chirkunda, Barakar, etc.).
-*   Categories (Electrician, Plumber, AC Repair) and core service list.
 
-### 4. Start the Application
+### 3. Running the Applications
 
-#### **Backend Server:**
+#### **Start Backend API & Socket Server**
 ```bash
 cd backend
 npm run dev
 ```
-*The server will run on `http://localhost:5000`.*
+*(Runs on `http://localhost:5000`)*
 
-#### **Frontend Customer Side (Angular):**
+#### **Start Customer & Provider Portal**
 ```bash
 cd frontend_userSide
 npm start
 ```
-*Accessible on `http://localhost:4200`.*
+*(Runs on `http://localhost:4200`)*
 
-#### **Frontend Admin Side (Angular):**
+#### **Start Admin Control Panel**
 ```bash
 cd frontend_admin_panel
 npm start
 ```
-*Accessible on `http://localhost:4201` (automatically sets up next port).*
+*(Runs on `http://localhost:4201`)*
 
 ---
 
-## 🔒 Security Implementations
-*   **BCrypt**: 10-rounds salt hashing for user password storage.
-*   **Helmet**: Auto-enforcement of HTTP headers protections (XSS, Clickjacking protection).
-*   **Rate Limiter**: Maximum 200 API calls per 15 minutes window per IP to avoid DDoS loops.
-*   **Express Validator**: Input validation on endpoints to block SQL Injections and malicious request states.
-*   **httpOnly Cookies**: Store JWT refresh tokens inside server-only cookies to stop token thefts from JavaScript memory.
+## 🔐 Default Admin Credentials
+- **Email**: `admin@localservice.com`
+- **Password**: `Admin@123`
+
+---
+
+## 🛡️ Security Best Practices
+- **Password Protection**: BCrypt hashing with 10 salt rounds.
+- **HTTP Security Headers**: Helmet configuration blocking clickjacking and XSS attacks.
+- **Token Security**: Refresh tokens stored in `httpOnly` secure cookies to prevent XSS token theft.
+- **Rate Limiting**: API limit of 200 requests per 15-minute window per IP.
+- **Input Validation**: Express-validator checking payload structure against SQL injection.
