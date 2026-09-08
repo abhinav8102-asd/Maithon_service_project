@@ -1,0 +1,95 @@
+<div class="profile-container container">
+  <h2>My Account Settings</h2>
+
+  <!-- Global alerts -->
+  <div *ngIf="feedbackMessage" [class.success-alert]="!isError" [class.error-alert]="isError">
+    {{ feedbackMessage }}
+  </div>
+
+  <div class="profile-grid">
+    <!-- User Avatar & Core Details -->
+    <div class="profile-card-left card">
+      <div class="avatar-wrapper">
+        <img 
+          [src]="authService.currentUser()?.profile?.profilePicture ? apiUrl + authService.currentUser().profile.profilePicture : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'" 
+          alt="User Profile" 
+          class="user-avatar"
+        />
+        <label class="avatar-upload-btn btn btn-outline">
+          Change Avatar
+          <input type="file" (change)="onFileSelected($event)" style="display: none;" />
+        </label>
+      </div>
+
+      <div class="user-details-summary">
+        <h3>{{ authService.currentUser()?.name }}</h3>
+        <span class="badge badge-info">{{ authService.currentUser()?.role }}</span>
+        <p><strong>Email:</strong> {{ authService.currentUser()?.email }}</p>
+        <p><strong>Phone:</strong> {{ authService.currentUser()?.phoneNumber }}</p>
+      </div>
+    </div>
+
+    <!-- Edit Profile Form & Security Settings -->
+    <div class="profile-card-right">
+      <!-- Address Details Card -->
+      <div class="card settings-card">
+        <div class="card-header">
+          <h3>Delivery Address Details</h3>
+          <button (click)="isEditing = !isEditing" class="btn btn-outline btn-sm">
+            {{ isEditing ? 'Cancel' : 'Edit Info' }}
+          </button>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" *ngIf="isEditing; else staticView">
+          <div class="form-group">
+            <label class="form-label">Full Address</label>
+            <textarea formControlName="address" rows="3" class="form-control" placeholder="House no, sector..."></textarea>
+          </div>
+
+          <div class="form-split">
+            <div class="form-group">
+              <label class="form-label">City</label>
+              <select formControlName="cityId" (change)="onCityChange()" class="form-control">
+                <option value="">-- Select City --</option>
+                <option *ngFor="let c of cities()" [value]="c.id">{{ c.name }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Area</label>
+              <select formControlName="areaId" class="form-control" [disabled]="!profileForm.get('cityId')?.value">
+                <option value="">-- Select Area --</option>
+                <option *ngFor="let a of areas()" [value]="a.id">{{ a.name }} - {{ a.pincode }}</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+
+        <ng-template #staticView>
+          <div class="static-address-details">
+            <p><strong>Address:</strong> {{ authService.currentUser()?.profile?.address || 'No address configured yet.' }}</p>
+            <p><strong>Pincode:</strong> {{ authService.currentUser()?.profile?.pincode || 'N/A' }}</p>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Password Change Card -->
+      <div class="card settings-card margin-top-30">
+        <h3>Change Account Password</h3>
+        
+        <form [formGroup]="passwordForm" (ngSubmit)="onSubmitPassword()">
+          <div class="form-group">
+            <label class="form-label">Old Password</label>
+            <input type="password" formControlName="oldPassword" class="form-control" placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" formControlName="newPassword" class="form-control" placeholder="••••••••" />
+          </div>
+          <button type="submit" [disabled]="passwordForm.invalid" class="btn btn-secondary">Update Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

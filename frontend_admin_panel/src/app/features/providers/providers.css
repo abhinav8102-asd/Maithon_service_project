@@ -1,0 +1,38 @@
+.providers-list-panel {
+  padding: 30px;
+  background-color: var(--bg-admin-card);
+}
+
+.panel-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-admin-title);
+  margin-bottom: 4px;
+}
+
+.panel-header p {
+  font-size: 0.88rem;
+  color: var(--text-admin-muted);
+}
+
+.docs-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.doc-link {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.doc-link:hover {
+  color: var(--primary-hover);
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}

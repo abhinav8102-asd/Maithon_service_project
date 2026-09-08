@@ -1,0 +1,162 @@
+<div class="services-panel">
+  <div class="panel-header card" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <div>
+      <h3>Platform Service Catalog Listings</h3>
+      <p>Configure individual service items (e.g. Split AC Jet Wash) and assign them to partners.</p>
+    </div>
+    <button (click)="openAdd()" class="btn btn-primary" *ngIf="!showAddForm && !showEditForm && !showAssignForm">+ Add Service Listing</button>
+  </div>
+
+  <div class="services-grid">
+    <!-- Services Table List -->
+    <div class="table-responsive card" style="grid-column: span 2;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Service Name</th>
+            <th>Parent Category</th>
+            <th>Base Price</th>
+            <th>Duration</th>
+            <th>Required Tools</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of services()">
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <img 
+                  [src]="s.images && s.images.length > 0 ? apiUrl + s.images[0] : 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=50&auto=format&fit=crop&q=60'" 
+                  alt="Service Image" 
+                  style="width: 36px; height: 36px; border-radius: var(--radius-sm); object-fit: cover;"
+                />
+                <strong>{{ s.name }}</strong>
+              </div>
+            </td>
+            <td><span class="badge badge-info">{{ s.Category?.name }}</span></td>
+            <td><strong>₹{{ s.price }}</strong></td>
+            <td>{{ s.durationMinutes }} Mins</td>
+            <td>
+              <div style="font-size: 0.8rem; color: var(--text-admin-muted);">
+                {{ formatTools(s.requiredTools) }}
+              </div>
+            </td>
+            <td style="text-align: right;">
+              <div style="display: inline-flex; gap: 8px;">
+                <button (click)="openAssign(s)" class="btn btn-primary btn-sm">Assign</button>
+                <button (click)="openEdit(s)" class="btn btn-secondary btn-sm">Edit</button>
+                <button (click)="deleteService(s.id)" class="btn btn-danger btn-sm">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="services().length === 0">
+            <td colspan="6" style="text-align: center; color: var(--text-admin-muted); padding: 30px;">
+              No service listings configured yet.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Forms Center Modal Popup Overlay (Add/Edit) -->
+    <div class="modal-backdrop" *ngIf="showAddForm || showEditForm">
+      <div class="card form-panel">
+        <div class="modal-header">
+          <h3>{{ showAddForm ? 'Create Service Listing' : 'Edit Service Listing' }}</h3>
+          <button (click)="closeForms()" class="close-btn">&times;</button>
+        </div>
+
+        <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="modal-form-wrapper">
+          <div class="modal-body">
+            <!-- Choose Category -->
+            <div class="form-group">
+              <label class="form-label">Parent Category</label>
+              <select formControlName="categoryId" class="form-control">
+                <option value="">-- Choose Category --</option>
+                <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
+              </select>
+            </div>
+
+            <!-- Name -->
+            <div class="form-group">
+              <label class="form-label">Service Name</label>
+              <input type="text" formControlName="name" class="form-control" placeholder="e.g. Split AC Jet Wash" />
+            </div>
+
+            <div class="form-split">
+              <!-- Price -->
+              <div class="form-group">
+                <label class="form-label">Base Price (₹)</label>
+                <input type="number" formControlName="price" class="form-control" />
+              </div>
+              <!-- Duration -->
+              <div class="form-group">
+                <label class="form-label">Duration (Mins)</label>
+                <input type="number" formControlName="durationMinutes" class="form-control" />
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea formControlName="description" rows="3" class="form-control" placeholder="Describe the listing scope..."></textarea>
+            </div>
+
+            <!-- Required Tools -->
+            <div class="form-group">
+              <label class="form-label">Required Tools (separated by commas)</label>
+              <input type="text" formControlName="requiredToolsList" class="form-control" placeholder="Water pump, ladder, screwdriver" />
+            </div>
+
+            <!-- Image Upload -->
+            <div class="form-group">
+              <label class="form-label">Upload Catalog Photos</label>
+              <input type="file" (change)="onFilesSelected($event)" multiple class="form-control" />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeForms()" class="btn btn-secondary">Cancel</button>
+            <button type="submit" [disabled]="serviceForm.invalid || loading" class="btn btn-primary">
+              {{ showAddForm ? 'Create Service' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Assign Provider Center Modal Popup Overlay -->
+    <div class="modal-backdrop" *ngIf="showAssignForm">
+      <div class="card form-panel">
+        <div class="modal-header">
+          <h3>Assign Service to Partner</h3>
+          <button (click)="closeForms()" class="close-btn">&times;</button>
+        </div>
+
+        <form [formGroup]="assignForm" (ngSubmit)="onSubmitAssign()" class="modal-form-wrapper">
+          <div class="modal-body">
+            <p style="font-size: 0.85rem; color: var(--text-admin-muted); margin-bottom: 20px;">
+              Assigning <strong>"{{ selectedService?.name }}"</strong> to a verified service provider makes them active in search results for this listing.
+            </p>
+
+            <!-- Choose Provider -->
+            <div class="form-group">
+              <label class="form-label">Select Verified Provider</label>
+              <select formControlName="providerId" class="form-control">
+                <option value="">-- Choose Partner --</option>
+                <option *ngFor="let p of providers()" [value]="p.id">
+                  {{ p.businessName || p.User?.name }} ({{ p.Area?.name }}, {{ p.City?.name }})
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeForms()" class="btn btn-secondary">Cancel</button>
+            <button type="submit" [disabled]="assignForm.invalid || loading" class="btn btn-primary">Assign Partner</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

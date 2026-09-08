@@ -1,0 +1,101 @@
+<div class="bookings-container container">
+  <h2>My Service Bookings</h2>
+
+  <!-- Navigation Filter Tabs -->
+  <div class="tabs-nav card">
+    <button [class.active]="activeTab === 'All'" (click)="filterTab('All')">All Bookings</button>
+    <button [class.active]="activeTab === 'Pending'" (click)="filterTab('Pending')">Pending</button>
+    <button [class.active]="activeTab === 'Accepted'" (click)="filterTab('Accepted')">Accepted</button>
+    <button [class.active]="activeTab === 'Completed'" (click)="filterTab('Completed')">Completed</button>
+    <button [class.active]="activeTab === 'Cancelled'" (click)="filterTab('Cancelled')">Cancelled</button>
+  </div>
+
+  <!-- Bookings List -->
+  <div *ngIf="filteredBookings().length === 0" class="no-bookings card">
+    <p>No bookings found under this category.</p>
+  </div>
+
+  <div class="bookings-list" *ngIf="filteredBookings().length > 0">
+    <div *ngFor="let b of filteredBookings()" class="booking-card card">
+      <div class="booking-card-header">
+        <div class="service-info">
+          <h3>{{ b.Service?.name }}</h3>
+          <p class="booking-date">Date: {{ b.bookingDate }} | Time: {{ b.bookingTime }}</p>
+        </div>
+        <span class="badge" [class.badge-warning]="b.status === 'Pending'" [class.badge-info]="b.status === 'Accepted'" [class.badge-success]="b.status === 'Completed'" [class.badge-danger]="b.status === 'Cancelled' || b.status === 'Rejected'">
+          {{ b.status }}
+        </span>
+      </div>
+
+      <div class="booking-card-body">
+        <div class="detail-section">
+          <p><strong>Provider:</strong> {{ b.Provider?.businessName || b.Provider?.User?.name }}</p>
+          <p><strong>Provider Contact:</strong> {{ b.Provider?.User?.phoneNumber }}</p>
+          <p><strong>Delivery Location:</strong> {{ b.address }}, {{ b.pincode }}</p>
+        </div>
+        <div class="price-section">
+          <p class="price-label">Billing Amount</p>
+          <p class="price-value">₹{{ b.price }}</p>
+          <span class="badge badge-success" style="font-size: 0.65rem;" *ngIf="b.Payment?.status === 'Paid'">PAID</span>
+          <span class="badge badge-warning" style="font-size: 0.65rem;" *ngIf="b.Payment?.status === 'Pending'">COD (PENDING)</span>
+        </div>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="booking-card-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <!-- Chat Action -->
+        <a [routerLink]="['/chat', b.Provider?.userId]" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;" *ngIf="b.Provider?.userId">
+          💬 Chat with Partner
+        </a>
+
+        <button *ngIf="b.status === 'Pending' || b.status === 'Accepted'" (click)="cancelBooking(b.id)" class="btn btn-danger btn-sm">
+          Cancel Service Request
+        </button>
+
+        <button *ngIf="b.status === 'Completed' && !b.Review" (click)="openReviewModal(b)" class="btn btn-primary btn-sm">
+          Rate & Review Partner
+        </button>
+
+        <span *ngIf="b.status === 'Completed' && b.Review" class="reviewed-stamp">
+          ✓ Rated {{ b.Review.rating }}★
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review submission modal overlay -->
+<div class="modal-backdrop" *ngIf="showReviewModal">
+  <div class="review-modal card">
+    <div class="modal-header">
+      <h3>Rate Service: {{ selectedBookingForReview?.Service?.name }}</h3>
+      <button (click)="closeReviewModal()" class="close-btn">&times;</button>
+    </div>
+
+    <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+      <div class="modal-body">
+        <!-- Star selection rating input -->
+        <div class="form-group">
+          <label class="form-label">Service Rating (1 to 5 Stars)</label>
+          <select formControlName="rating" class="form-control">
+            <option [value]="5">5 Stars (Excellent)</option>
+            <option [value]="4">4 Stars (Good)</option>
+            <option [value]="3">3 Stars (Average)</option>
+            <option [value]="2">2 Stars (Poor)</option>
+            <option [value]="1">1 Star (Very Bad)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Review Comment</label>
+          <textarea formControlName="comment" rows="4" class="form-control" placeholder="Write about your experience with this local professional..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="closeReviewModal()" class="btn btn-outline">Close</button>
+        <button type="submit" [disabled]="reviewForm.invalid" class="btn btn-primary">Submit Review</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+.dashboard-widgets-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-bookings-panel {
+  padding: 30px;
+  background-color: var(--bg-admin-card);
+}
+
+.recent-bookings-panel h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-admin-title);
+  margin-bottom: 20px;
+}

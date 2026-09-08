@@ -1,0 +1,304 @@
+<div class="profile-container container">
+  <h2>Business Portal Settings</h2>
+
+
+
+  <div class="profile-grid">
+    <!-- Left side owner information card -->
+    <div class="profile-card-left card">
+      <div class="user-details-summary">
+        <div class="avatar-circle">
+          {{ authService.currentUser()?.name?.charAt(0) || 'P' }}
+        </div>
+        <h3>{{ authService.currentUser()?.profile?.businessName || authService.currentUser()?.name }}</h3>
+        
+        <span class="badge badge-success" *ngIf="authService.currentUser()?.profile?.kycStatus === 'Verified'">KYC Verified Partner</span>
+        <span class="badge badge-warning" *ngIf="authService.currentUser()?.profile?.kycStatus !== 'Verified'">KYC Pending Partner</span>
+        
+        <div class="meta-details-list" style="margin-top: 20px;">
+          <p><strong>Owner Name:</strong> {{ authService.currentUser()?.name }}</p>
+          <p><strong>Email Address:</strong> {{ authService.currentUser()?.email }}</p>
+          <p><strong>Phone Contact:</strong> {{ authService.currentUser()?.phoneNumber }}</p>
+          <p><strong>Plan Tier:</strong> {{ activeSubscription()?.SubscriptionPackage?.name || 'Free/Basic' }}</p>
+          <p *ngIf="activeSubscription()?.SubscriptionPackage?.isFeatured">
+            <span style="color: gold; font-weight: bold;">⭐ Featured Search Rank</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right settings components (Tabbed layout) -->
+    <div class="profile-card-right">
+      
+      <!-- Tab Headers Navigation Bar -->
+      <div class="profile-tabs-header">
+        <button (click)="activeTab = 'profile'" [class.active]="activeTab === 'profile'" class="tab-header-btn">
+          Business Info
+        </button>
+        <button (click)="activeTab = 'services'" [class.active]="activeTab === 'services'" class="tab-header-btn">
+          Services Portfolio & Custom Pricing
+        </button>
+        <button (click)="activeTab = 'subscriptions'" [class.active]="activeTab === 'subscriptions'" class="tab-header-btn">
+          Subscriptions & Plans
+        </button>
+      </div>
+
+      <!-- TAB 1: PROFILE INFO -->
+      <div *ngIf="activeTab === 'profile'" class="tab-content-area">
+        <div class="card settings-card">
+          <div class="card-header">
+            <h3>Professional Business Specifications</h3>
+            <button (click)="isEditing = !isEditing" class="btn btn-outline btn-sm">
+              {{ isEditing ? 'Cancel' : 'Edit Specs' }}
+            </button>
+          </div>
+
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" *ngIf="isEditing; else staticView">
+            <!-- Business Name -->
+            <div class="form-group">
+              <label class="form-label">Shop / Business Name</label>
+              <input type="text" formControlName="businessName" class="form-control" placeholder="e.g. Maithon Electric Services" />
+            </div>
+
+            <div class="form-split">
+              <!-- Experience -->
+              <div class="form-group">
+                <label class="form-label">Years of Experience</label>
+                <input type="number" formControlName="experienceYears" class="form-control" />
+              </div>
+              <!-- Pricing -->
+              <div class="form-group">
+                <label class="form-label">Standard Base Rate (₹)</label>
+                <input type="number" formControlName="pricing" class="form-control" readonly />
+                <span class="input-helper">Auto-calculated from your lowest portfolio service rate.</span>
+              </div>
+            </div>
+
+            <div class="form-split">
+              <!-- City -->
+              <div class="form-group">
+                <label class="form-label">Operating City</label>
+                <select formControlName="cityId" (change)="onCityChange()" class="form-control">
+                  <option value="">-- Select City --</option>
+                  <option *ngFor="let c of cities()" [value]="c.id">{{ c.name }}</option>
+                </select>
+              </div>
+              <!-- Area -->
+              <div class="form-group">
+                <label class="form-label">Operating Area / Locality</label>
+                <select formControlName="areaId" class="form-control" [disabled]="!profileForm.get('cityId')?.value">
+                  <option value="">-- Select Area --</option>
+                  <option *ngFor="let a of areas()" [value]="a.id">{{ a.name }} - {{ a.pincode }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-split">
+              <!-- Hours Start -->
+              <div class="form-group">
+                <label class="form-label">Working Hours Start</label>
+                <input type="time" formControlName="workingHoursStart" class="form-control" />
+              </div>
+              <!-- Hours End -->
+              <div class="form-group">
+                <label class="form-label">Working Hours End</label>
+                <input type="time" formControlName="workingHoursEnd" class="form-control" />
+              </div>
+            </div>
+
+            <!-- Skills comma list -->
+            <div class="form-group">
+              <label class="form-label">Skills (separated by commas)</label>
+              <input type="text" formControlName="skillsList" class="form-control" placeholder="Wiring, AC Repair, Appliance setup" />
+            </div>
+
+            <!-- Languages comma list -->
+            <div class="form-group">
+              <label class="form-label">Languages spoken (separated by commas)</label>
+              <input type="text" formControlName="languagesList" class="form-control" placeholder="Hindi, English, Bengali" />
+            </div>
+
+            <button type="submit" [disabled]="profileForm.invalid" class="btn btn-primary">Save Changes</button>
+          </form>
+
+          <ng-template #staticView>
+            <div class="static-address-details">
+              <p><strong>Business Name:</strong> {{ authService.currentUser()?.profile?.businessName || 'Not configured yet.' }}</p>
+              <p><strong>Years Experience:</strong> {{ authService.currentUser()?.profile?.experienceYears }} Years</p>
+              <p><strong>Lowest Rate (Search base price):</strong> ₹{{ authService.currentUser()?.profile?.pricing || 0 }}</p>
+              <p><strong>Work Hours:</strong> {{ authService.currentUser()?.profile?.workingHours?.start }} - {{ authService.currentUser()?.profile?.workingHours?.end }}</p>
+              <p><strong>Languages Spoken:</strong> {{ authService.currentUser()?.profile?.languages?.join(', ') || 'N/A' }}</p>
+              <p><strong>Skills Log:</strong></p>
+              <div class="skills-block" *ngIf="authService.currentUser()?.profile?.skills">
+                <span class="service-pill" *ngFor="let s of authService.currentUser()?.profile?.skills">{{ s }}</span>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Password Card -->
+        <div class="card settings-card margin-top-30">
+          <h3>Change Account Password</h3>
+          
+          <form [formGroup]="passwordForm" (ngSubmit)="onSubmitPassword()">
+            <div class="form-group">
+              <label class="form-label">Old Password</label>
+              <input type="password" formControlName="oldPassword" class="form-control" placeholder="••••••••" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" formControlName="newPassword" class="form-control" placeholder="••••••••" />
+            </div>
+            <button type="submit" [disabled]="passwordForm.invalid" class="btn btn-secondary">Update Password</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 2: PORTFOLIO & PRICING -->
+      <div *ngIf="activeTab === 'services'" class="tab-content-area animate-fade-in">
+        <div class="card limits-indicator-card">
+          <div class="limits-header">
+            <h4>Service List Limits Indicator</h4>
+            <span class="plan-label-badge">{{ activeSubscription()?.SubscriptionPackage?.name || 'No Active Plan' }}</span>
+          </div>
+          <div class="limits-progress">
+            <span class="progress-label">Listed: <strong>{{ myServices().length }}</strong> of max <strong>{{ getMaxServicesLimit() }}</strong> allowed services</span>
+            <div class="bar-bg">
+              <div class="bar-fill" [style.width.%]="(myServices().length / getMaxServicesLimit()) * 100"></div>
+            </div>
+          </div>
+          <p class="upgrade-helper-text" *ngIf="myServices().length >= getMaxServicesLimit()">
+            ⚠️ limit reached! Please upgrade your plan under "Subscriptions & Plans" tab to list more categories.
+          </p>
+        </div>
+
+        <div class="card services-portfolio-card margin-top-20">
+          <div class="card-header-clean">
+            <h3>Add and Modify Offered Services</h3>
+            <p>Customize your service offerings. Choose categories you specialize in, and specify your desired rate rate.</p>
+          </div>
+
+          <div class="services-list-container">
+            <div *ngFor="let s of allServices()" class="service-list-row">
+              <div class="service-meta">
+                <span class="service-name">{{ s.name }}</span>
+                <span class="default-price-tag">Standard template price: ₹{{ s.price }}</span>
+              </div>
+
+              <div class="service-actions-area">
+                <!-- If already listed -->
+                <div *ngIf="isServiceInPortfolio(s.id); else assignServiceBlock" class="listed-action-form">
+                  <div class="price-input-wrapper">
+                    <span>₹</span>
+                    <input type="number" #customRate [value]="getPortfolioPrice(s.id)" class="form-control compact-input" />
+                  </div>
+                  <button (click)="updateServicePrice(s.id, +customRate.value)" class="btn btn-secondary btn-sm">Update Price</button>
+                  <button (click)="removeServiceFromPortfolio(s.id)" class="btn btn-danger btn-sm icon-btn">Unlist</button>
+                </div>
+
+                <!-- If not listed -->
+                <ng-template #assignServiceBlock>
+                  <div class="unlisted-action-form">
+                    <div class="price-input-wrapper">
+                      <span>₹</span>
+                      <input type="number" #newRate placeholder="Your Rate" class="form-control compact-input" />
+                    </div>
+                    <button (click)="addServiceToPortfolio(s.id, newRate)" [disabled]="myServices().length >= getMaxServicesLimit()" class="btn btn-primary btn-sm">
+                      + List Service
+                    </button>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+            
+            <div class="empty-state" *ngIf="allServices().length === 0">
+              No services templates found. Add templates in categories first.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: SUBSCRIPTION PLANS -->
+      <div *ngIf="activeTab === 'subscriptions'" class="tab-content-area animate-fade-in">
+        <!-- Active plan metadata -->
+        <div class="card active-subscription-detail">
+          <h3>Your Current Subscription</h3>
+          <div class="active-sub-grid" *ngIf="activeSubscription(); else noActiveSubscriptionBlock">
+            <div class="sub-data-col">
+              <label>Plan Package</label>
+              <span>{{ activeSubscription()?.SubscriptionPackage?.name }}</span>
+            </div>
+            <div class="sub-data-col">
+              <label>Price Rate</label>
+              <span>₹{{ activeSubscription()?.SubscriptionPackage?.price }} / {{ activeSubscription()?.SubscriptionPackage?.durationDays }} days</span>
+            </div>
+            <div class="sub-data-col">
+              <label>Max Services</label>
+              <span>{{ activeSubscription()?.SubscriptionPackage?.maxServices }} Categories</span>
+            </div>
+            <div class="sub-data-col">
+              <label>Expires On</label>
+              <span>{{ activeSubscription()?.endDate | date:'mediumDate' }}</span>
+            </div>
+            <div class="sub-data-col featured-col">
+              <label>Search Rank Promotion</label>
+              <span *ngIf="activeSubscription()?.SubscriptionPackage?.isFeatured" class="featured-promote-badge">⭐ Top Featured</span>
+              <span *ngIf="!activeSubscription()?.SubscriptionPackage?.isFeatured">Normal Search Placement</span>
+            </div>
+          </div>
+          
+          <ng-template #noActiveSubscriptionBlock>
+            <div class="no-sub-banner">
+              <p>You do not have any active paid subscription plans. You are currently restricted to the Free Basic Plan.</p>
+              <span class="basic-limits-info">Free Basic Limit: List up to 2 services maximum. Normal Search rankings.</span>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Available billing plans -->
+        <div class="packages-list-area margin-top-30">
+          <h3>Upgrade Packages Catalog</h3>
+          <p class="section-subtitle">Boost your visibility and expand your business by purchasing a subscription package.</p>
+          
+          <div class="plans-cards-grid">
+            <div *ngFor="let pkg of subscriptionPackages()" class="plan-price-card" [class.featured-card]="pkg.isFeatured" [class.current-active-plan]="activeSubscription()?.packageId === pkg.id">
+              <div class="card-featured-ribbon" *ngIf="pkg.isFeatured">⭐ Popular Featured</div>
+              <h4>{{ pkg.name }}</h4>
+              
+              <div class="price-block">
+                <span class="currency">₹</span>
+                <span class="amt">{{ pkg.price }}</span>
+                <span class="period">/ {{ pkg.durationDays }} Days</span>
+              </div>
+              
+              <p class="plan-desc">{{ pkg.description || 'Access basic provider catalog integrations.' }}</p>
+              
+              <ul class="plan-features">
+                <li>✔️ List up to <strong>{{ pkg.maxServices }}</strong> services</li>
+                <li>✔️ Operating days & duration <strong>{{ pkg.durationDays }}</strong> Days</li>
+                <li>
+                  <span *ngIf="pkg.isFeatured">✔️ <strong>Top Featured</strong> search visibility</span>
+                  <span *ngIf="!pkg.isFeatured">❌ Standard search visibility</span>
+                </li>
+              </ul>
+              
+              <div class="plan-card-action">
+                <button *ngIf="activeSubscription()?.packageId === pkg.id" disabled class="btn btn-secondary btn-full">
+                  Current Active Plan
+                </button>
+                <button *ngIf="activeSubscription()?.packageId !== pkg.id" (click)="buySubscription(pkg.id)" class="btn btn-primary btn-full">
+                  Activate & Subscribe
+                </button>
+              </div>
+            </div>
+            
+            <div class="empty-state" *ngIf="subscriptionPackages().length === 0">
+              No subscription packages created by Admin yet. Log in to Admin panel (Port 4201) to create plans first.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

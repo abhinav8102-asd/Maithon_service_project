@@ -1,0 +1,21 @@
+.categories-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  align-items: start;
+}
+
+.form-panel {
+  background-color: var(--bg-admin-card);
+  padding: 30px;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}

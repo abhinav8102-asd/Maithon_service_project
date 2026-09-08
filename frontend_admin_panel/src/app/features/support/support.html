@@ -1,0 +1,50 @@
+<div class="support-panel card">
+  <div class="panel-header">
+    <h3>Customer Support Tickets</h3>
+    <p>Review contact messages and queries submitted by landing page visitors and customers.</p>
+  </div>
+
+  <div class="table-responsive" style="margin-top: 24px;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Contact Name</th>
+          <th>Email Address</th>
+          <th>Query Message</th>
+          <th>Status</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let msg of messages()">
+          <td>{{ msg.createdAt | date: 'medium' }}</td>
+          <td><strong>{{ msg.name }}</strong></td>
+          <td><code>{{ msg.email }}</code></td>
+          <td style="max-width: 320px; white-space: normal;">{{ msg.message }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="msg.status === 'Resolved'" [class.badge-warning]="msg.status === 'Pending'">
+              {{ msg.status }}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <!-- Resolve button -->
+            <button 
+              *ngIf="msg.status === 'Pending'" 
+              (click)="resolveMessage(msg.id)" 
+              class="btn btn-success btn-sm"
+            >
+              Mark Resolved
+            </button>
+            <span *ngIf="msg.status === 'Resolved'" style="color: var(--text-admin-muted); font-size: 0.85rem;">Completed</span>
+          </td>
+        </tr>
+        <tr *ngIf="messages().length === 0">
+          <td colspan="6" style="text-align: center; color: var(--text-admin-muted); padding: 30px;">
+            No support queries or messages found.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

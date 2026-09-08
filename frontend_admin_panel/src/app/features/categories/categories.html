@@ -1,0 +1,118 @@
+<div class="categories-panel">
+  <div class="panel-header card" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <div>
+      <h3>Platform Service Categories</h3>
+      <p>Configure primary service sectors (e.g. Electricians, RO Repair) visible to customers.</p>
+    </div>
+    <button (click)="openAdd()" class="btn btn-primary" *ngIf="!showAddForm && !showEditForm">+ Add Category</button>
+  </div>
+
+  <div class="categories-grid">
+    <!-- Categories List Table -->
+    <div class="table-responsive card" style="grid-column: span 2;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Category Name</th>
+            <th>Slug Reference</th>
+            <th>SEO Title</th>
+            <th>Status</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cat of categories()">
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <img 
+                  [src]="cat.icon ? apiUrl + cat.icon : 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=50&auto=format&fit=crop&q=60'" 
+                  alt="Icon" 
+                  style="width: 32px; height: 32px; border-radius: var(--radius-sm); object-fit: cover;"
+                />
+                <strong>{{ cat.name }}</strong>
+              </div>
+            </td>
+            <td><code>{{ cat.slug }}</code></td>
+            <td>{{ cat.seoTitle || 'N/A' }}</td>
+            <td>
+              <span class="badge" [class.badge-success]="cat.status === 'Enabled'" [class.badge-danger]="cat.status === 'Disabled'">
+                {{ cat.status }}
+              </span>
+            </td>
+            <td style="text-align: right;">
+              <div style="display: inline-flex; gap: 8px;">
+                <button (click)="openEdit(cat)" class="btn btn-secondary btn-sm">Edit</button>
+                <button (click)="deleteCategory(cat.id)" class="btn btn-danger btn-sm">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="categories().length === 0">
+            <td colspan="5" style="text-align: center; color: var(--text-admin-muted); padding: 30px;">
+              No service categories found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Forms Center Modal Popup Overlay (Add/Edit) -->
+    <div class="modal-backdrop" *ngIf="showAddForm || showEditForm">
+      <div class="card form-panel">
+        <div class="modal-header">
+          <h3>{{ showAddForm ? 'Add New Category' : 'Edit Category' }}</h3>
+          <button (click)="closeForms()" class="close-btn">&times;</button>
+        </div>
+
+        <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()" class="modal-form-wrapper">
+          <div class="modal-body">
+            <!-- Name -->
+            <div class="form-group">
+              <label class="form-label">Category Name</label>
+              <input type="text" formControlName="name" class="form-control" placeholder="e.g. Electrician" />
+            </div>
+
+            <!-- SEO Title -->
+            <div class="form-group">
+              <label class="form-label">SEO Title (meta tag)</label>
+              <input type="text" formControlName="seoTitle" class="form-control" placeholder="Best Electricians in Dhanbad" />
+            </div>
+
+            <!-- SEO Description -->
+            <div class="form-group">
+              <label class="form-label">SEO Description</label>
+              <textarea formControlName="seoDescription" rows="2" class="form-control" placeholder="Brief metadata description..."></textarea>
+            </div>
+
+            <!-- Icon Upload -->
+            <div class="form-group">
+              <label class="form-label">Category Icon (Image)</label>
+              <input type="file" (change)="onIconSelected($event)" class="form-control" />
+            </div>
+
+            <!-- Banner Upload -->
+            <div class="form-group">
+              <label class="form-label">Category Banner (Header Image)</label>
+              <input type="file" (change)="onBannerSelected($event)" class="form-control" />
+            </div>
+
+            <!-- Status -->
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select formControlName="status" class="form-control">
+                <option value="Enabled">Enabled (Visible)</option>
+                <option value="Disabled">Disabled (Hidden)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeForms()" class="btn btn-secondary">Cancel</button>
+            <button type="submit" [disabled]="categoryForm.invalid || loading" class="btn btn-primary">
+              {{ showAddForm ? 'Create Category' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

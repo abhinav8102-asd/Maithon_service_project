@@ -1,0 +1,64 @@
+<div class="kyc-container container">
+  <h2>KYC Partner Verification</h2>
+
+  <!-- Status Alert Banners -->
+  <div class="kyc-status-banner verified" *ngIf="currentKycStatus === 'Verified'">
+    <div class="banner-icon">✓</div>
+    <div class="banner-text">
+      <h3>Verification Approved</h3>
+      <p>Your business profile is fully verified! Your service listings are now active and visible to local customers.</p>
+    </div>
+  </div>
+
+  <div class="kyc-status-banner pending" *ngIf="currentKycStatus === 'Pending' && !submitted">
+    <div class="banner-icon">⏳</div>
+    <div class="banner-text">
+      <h3>Verification Pending Review</h3>
+      <p>Your uploaded documents are currently being checked by our compliance desk. You will be notified once active.</p>
+    </div>
+  </div>
+
+  <div class="kyc-status-banner rejected" *ngIf="currentKycStatus === 'Rejected'">
+    <div class="banner-icon">⚠</div>
+    <div class="banner-text">
+      <h3>Verification Rejected</h3>
+      <p>Your documentation check failed. Please re-upload clear and valid PDF/JPEG files of your PAN and Aadhaar card.</p>
+    </div>
+  </div>
+
+  <!-- Success state after submission -->
+  <div class="kyc-status-banner submitted-banner" *ngIf="submitted">
+    <div class="banner-icon">🎉</div>
+    <div class="banner-text">
+      <h3>Documents Submitted Successfully!</h3>
+      <p>Your KYC documents have been uploaded and are pending admin review. We will notify you within 24–48 hours.</p>
+    </div>
+  </div>
+
+  <!-- Main forms card — hide after submission or when Verified -->
+  <div class="card kyc-card" *ngIf="currentKycStatus !== 'Verified' && !submitted">
+    <h3>Upload Verification Documents</h3>
+    <p class="description-text">Please provide valid identification documents to activate your partner profile. Max file size: 5MB. Accepted: PDF, JPEG, PNG.</p>
+
+    <form (submit)="onSubmitKyc($event)">
+      <!-- Aadhaar upload -->
+      <div class="form-group document-input-box">
+        <label class="form-label">Aadhaar Card (Front &amp; Back merged or PDF)</label>
+        <input type="file" (change)="onAadhaarSelected($event)" accept=".pdf,.png,.jpg,.jpeg" class="form-control" />
+        <span class="file-name-indicator" *ngIf="selectedAadhaar">✅ Selected: {{ selectedAadhaar.name }}</span>
+      </div>
+
+      <!-- PAN upload -->
+      <div class="form-group document-input-box">
+        <label class="form-label">PAN Card (PDF or Image)</label>
+        <input type="file" (change)="onPanSelected($event)" accept=".pdf,.png,.jpg,.jpeg" class="form-control" />
+        <span class="file-name-indicator" *ngIf="selectedPan">✅ Selected: {{ selectedPan.name }}</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loading || (!selectedAadhaar && !selectedPan)">
+        <span *ngIf="!loading">Submit KYC Documents</span>
+        <span *ngIf="loading" class="spinner"></span>
+      </button>
+    </form>
+  </div>
+</div>

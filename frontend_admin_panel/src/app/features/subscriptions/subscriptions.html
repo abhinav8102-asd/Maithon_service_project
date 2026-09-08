@@ -1,0 +1,132 @@
+<div class="subscriptions-panel">
+  <div class="panel-header card" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <div>
+      <h3>Subscription Packages</h3>
+      <p>Configure subscription plans for service providers with custom pricing, service limits, and rank priorities.</p>
+    </div>
+    <button (click)="openAdd()" class="btn btn-primary" *ngIf="!showAddForm && !showEditForm">+ Add Package</button>
+  </div>
+
+  <div class="subscriptions-grid">
+    <!-- Packages List Table -->
+    <div class="table-responsive card" style="grid-column: span 2;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Package Name</th>
+            <th>Price</th>
+            <th>Duration</th>
+            <th>Max Services</th>
+            <th>Featured Placement</th>
+            <th>Status</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pkg of packages()">
+            <td>
+              <div>
+                <strong>{{ pkg.name }}</strong>
+                <div style="font-size: 12px; color: var(--text-admin-muted);">{{ pkg.description }}</div>
+              </div>
+            </td>
+            <td><strong>₹{{ pkg.price }}</strong></td>
+            <td>{{ pkg.durationDays }} Days</td>
+            <td>
+              <span class="badge badge-info">{{ pkg.maxServices }} Services</span>
+            </td>
+            <td>
+              <span class="badge" [class.badge-success]="pkg.isFeatured" [class.badge-secondary]="!pkg.isFeatured">
+                {{ pkg.isFeatured ? 'Yes (Gold Badge)' : 'No (Standard)' }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [class.badge-success]="pkg.status === 'Active'" [class.badge-danger]="pkg.status === 'Inactive'">
+                {{ pkg.status }}
+              </span>
+            </td>
+            <td style="text-align: right;">
+              <div style="display: inline-flex; gap: 8px;">
+                <button (click)="openEdit(pkg)" class="btn btn-secondary btn-sm">Edit</button>
+                <button (click)="deletePackage(pkg.id)" class="btn btn-danger btn-sm">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="packages().length === 0">
+            <td colspan="7" style="text-align: center; color: var(--text-admin-muted); padding: 30px;">
+              No subscription packages found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Forms Modal Overlay (Add/Edit) -->
+    <div class="modal-backdrop" *ngIf="showAddForm || showEditForm">
+      <div class="card form-panel">
+        <div class="modal-header">
+          <h3>{{ showAddForm ? 'Create Subscription Package' : 'Edit Subscription Package' }}</h3>
+          <button (click)="closeForms()" class="close-btn">&times;</button>
+        </div>
+
+        <form [formGroup]="packageForm" (ngSubmit)="onSubmit()" class="modal-form-wrapper">
+          <div class="modal-body">
+            <!-- Name -->
+            <div class="form-group">
+              <label class="form-label">Package Name</label>
+              <input type="text" formControlName="name" class="form-control" placeholder="e.g. Gold Featured Plan" />
+            </div>
+
+            <!-- Price -->
+            <div class="form-group">
+              <label class="form-label">Price (INR)</label>
+              <input type="number" formControlName="price" class="form-control" placeholder="e.g. 499" />
+            </div>
+
+            <!-- Duration -->
+            <div class="form-group">
+              <label class="form-label">Duration (Days)</label>
+              <input type="number" formControlName="durationDays" class="form-control" placeholder="e.g. 30" />
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label class="form-label">Short Description</label>
+              <textarea formControlName="description" rows="3" class="form-control" placeholder="Describe the package benefits..."></textarea>
+            </div>
+
+            <!-- Max Services -->
+            <div class="form-group">
+              <label class="form-label">Max Services Provider Can Add</label>
+              <input type="number" formControlName="maxServices" class="form-control" placeholder="e.g. 20" />
+            </div>
+
+            <!-- Featured Placement Checkbox -->
+            <div class="form-group checkbox-group" style="display: flex; align-items: center; gap: 8px; margin: 15px 0;">
+              <input type="checkbox" id="isFeatured" formControlName="isFeatured" />
+              <label for="isFeatured" class="form-label" style="margin-bottom: 0; cursor: pointer;">
+                Promote to Featured Listing (Includes gold badge & top rank)
+              </label>
+            </div>
+
+            <!-- Status -->
+            <div class="form-group" *ngIf="showEditForm">
+              <label class="form-label">Status</label>
+              <select formControlName="status" class="form-control">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeForms()" class="btn btn-secondary">Cancel</button>
+            <button type="submit" [disabled]="packageForm.invalid || loading" class="btn btn-primary">
+              {{ showAddForm ? 'Create Package' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

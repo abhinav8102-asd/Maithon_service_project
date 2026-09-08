@@ -1,0 +1,33 @@
+<div class="favorites-container container">
+  <h2>My Bookmarked Providers</h2>
+
+  <div *ngIf="favorites().length === 0" class="no-favorites card">
+    <p>You have not bookmarked any service providers yet.</p>
+  </div>
+
+  <div class="favorites-grid" *ngIf="favorites().length > 0">
+    <div *ngFor="let fav of favorites()" class="fav-card card card-hover">
+      <div class="fav-header">
+        <img 
+          src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=60" 
+          alt="Avatar" 
+          class="fav-img"
+        />
+        <div class="fav-title">
+          <h3>{{ fav.Provider?.businessName || fav.Provider?.User?.name }}</h3>
+          <p class="locality">{{ fav.Provider?.Area?.name }}, {{ fav.Provider?.City?.name }}</p>
+        </div>
+      </div>
+
+      <div class="fav-body">
+        <p><strong>Primary Partner:</strong> {{ fav.Provider?.User?.name }}</p>
+        <p><strong>Contact Email:</strong> {{ fav.Provider?.User?.email }}</p>
+        <p><strong>Standard Base Pricing:</strong> ₹{{ fav.Provider?.pricing }}</p>
+      </div>
+
+      <div class="fav-actions">
+        <button (click)="removeFavorite(fav.Provider?.id)" class="btn btn-danger btn-sm">Remove Bookmark</button>
+      </div>
+    </div>
+  </div>
+</div>

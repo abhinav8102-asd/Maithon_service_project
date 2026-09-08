@@ -1,0 +1,126 @@
+.bookings-container {
+  padding: 40px 20px;
+}
+
+.bookings-container h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--secondary-color);
+  margin-bottom: 30px;
+  letter-spacing: -0.5px;
+}
+
+.tabs-nav {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  margin-bottom: 30px;
+  background-color: var(--surface-color);
+  overflow-x: auto;
+}
+
+.tabs-nav button {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.tabs-nav button:hover {
+  background-color: var(--background-color);
+  color: var(--primary-color);
+}
+
+.tabs-nav button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.no-bookings {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.booking-card {
+  padding: 24px;
+}
+
+.booking-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+.service-info h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.booking-date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.booking-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.detail-section p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.price-section {
+  text-align: right;
+}
+
+.price-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.price-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.booking-card-actions {
+  border-top: 1px solid var(--border-color);
+  padding-top: 14px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}

@@ -1,0 +1,111 @@
+<div class="admin-layout" *ngIf="authService.isLoggedIn(); else guestLayout">
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar" [class.mobile-open]="isSidebarOpen">
+    <div class="sidebar-brand">
+      <h2>Local Hub Admin</h2>
+      <span>Control Center</span>
+    </div>
+    
+    <nav class="sidebar-menu">
+      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">📊</span> Dashboard
+      </a>
+      <a routerLink="/providers" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">🛠️</span> Verify Providers
+      </a>
+      <a routerLink="/categories" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">📁</span> Categories
+      </a>
+      <a routerLink="/services" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">💼</span> Services
+      </a>
+      <a routerLink="/subscriptions" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">💎</span> Subscriptions
+      </a>
+      <a routerLink="/bookings" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">📅</span> Bookings List
+      </a>
+      <a routerLink="/support" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">✉️</span> Support Tickets
+      </a>
+      <a routerLink="/chats" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">💬</span> Chat Monitor
+      </a>
+      <a routerLink="/settings" routerLinkActive="active" (click)="closeSidebar()" class="menu-item">
+        <span class="menu-icon">⚙️</span> System Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button (click)="logout(); closeSidebar()" class="btn btn-danger btn-block">Log Out</button>
+    </div>
+  </aside>
+
+  <!-- Mobile Backdrop Overlay when Drawer is open -->
+  <div class="sidebar-overlay-backdrop" *ngIf="isSidebarOpen" (click)="closeSidebar()"></div>
+
+  <!-- Main Content Panel -->
+  <div class="admin-content-panel">
+    <header class="admin-topbar-header">
+      <div style="display: flex; align-items: center;">
+        <button class="hamburger-btn" (click)="toggleSidebar()">☰</button>
+        <div class="header-breadcrumb">
+          <h3>Platform Administrator Dashboard</h3>
+        </div>
+      </div>
+      
+      <div class="header-profile" style="display: flex; align-items: center; gap: 20px;">
+        <button (click)="toggleTheme()" class="theme-toggle-btn" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+          {{ isDarkMode ? '☀️' : '🌙' }}
+        </button>
+        <span>Welcome, <strong>Super Admin</strong></span>
+      </div>
+    </header>
+
+    <main class="admin-page-body">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<ng-template #guestLayout>
+  <router-outlet></router-outlet>
+</ng-template>
+
+<!-- ===== GLOBAL TOAST NOTIFICATION STACK ===== -->
+<div class="admin-toast-stack" aria-live="polite">
+  <div
+    *ngFor="let toast of toastService.toasts()"
+    class="atoast-item"
+    [class.atoast-success]="toast.type === 'success'"
+    [class.atoast-error]="toast.type === 'error'"
+    [class.atoast-warning]="toast.type === 'warning'"
+    [class.atoast-info]="toast.type === 'info'"
+    (click)="toastService.remove(toast.id)"
+  >
+    <span class="atoast-icon">
+      <span *ngIf="toast.type === 'success'">✅</span>
+      <span *ngIf="toast.type === 'error'">❌</span>
+      <span *ngIf="toast.type === 'warning'">⚠️</span>
+      <span *ngIf="toast.type === 'info'">ℹ️</span>
+    </span>
+    <span class="atoast-message">{{ toast.message }}</span>
+    <button class="atoast-close" (click)="$event.stopPropagation(); toastService.remove(toast.id)">×</button>
+  </div>
+</div>
+
+<!-- ===== GLOBAL CONFIRM DIALOG ===== -->
+<div class="aconfirm-backdrop" *ngIf="toastService.confirmDialog()" (click)="toastService.resolveConfirm(false)">
+  <div class="aconfirm-box" (click)="$event.stopPropagation()">
+    <div class="aconfirm-icon">🤔</div>
+    <p class="aconfirm-message">{{ toastService.confirmDialog()?.message }}</p>
+    <div class="aconfirm-actions">
+      <button class="btn btn-outline aconfirm-cancel" (click)="toastService.resolveConfirm(false)">
+        {{ toastService.confirmDialog()?.cancelText }}
+      </button>
+      <button class="btn btn-danger aconfirm-ok" (click)="toastService.resolveConfirm(true)">
+        {{ toastService.confirmDialog()?.confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="providers-list-panel card">
+  <div class="panel-header">
+    <h3>Verify Service Partners & Shops</h3>
+    <p>Review uploaded documents (Aadhaar / PAN) and verify profiles to active search listings.</p>
+  </div>
+
+  <div class="table-responsive" style="margin-top: 20px;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Owner Details</th>
+          <th>Business / Shop</th>
+          <th>Coverage Location</th>
+          <th>KYC Status</th>
+          <th>Documents Uploaded</th>
+          <th>Account state</th>
+          <th style="text-align: right;">Action Commands</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of providers()">
+          <!-- Owner Info -->
+          <td>
+            <strong>{{ p.User?.name }}</strong>
+            <div style="font-size: 0.8rem; color: var(--text-admin-muted);">
+              {{ p.User?.email }}<br/>{{ p.User?.phoneNumber }}
+            </div>
+          </td>
+
+          <!-- Business name -->
+          <td>
+            <strong>{{ p.businessName || 'No business configuration' }}</strong>
+            <div style="font-size: 0.8rem; color: var(--text-admin-muted);">Base Fare: ₹{{ p.pricing }}</div>
+          </td>
+
+          <!-- Operating area -->
+          <td>
+            {{ p.Area?.name || 'N/A' }}
+            <div style="font-size: 0.8rem; color: var(--text-admin-muted);">{{ p.City?.name }}</div>
+          </td>
+
+          <!-- KYC status -->
+          <td>
+            <span class="badge" [class.badge-success]="p.kycStatus === 'Verified'" [class.badge-warning]="p.kycStatus === 'Pending'" [class.badge-danger]="p.kycStatus === 'Rejected'">
+              {{ p.kycStatus }}
+            </span>
+          </td>
+
+          <!-- Documents -->
+          <td>
+            <div class="docs-links">
+              <a *ngIf="p.aadhaarPath" [href]="apiUrl + p.aadhaarPath" target="_blank" class="doc-link">Aadhaar Card</a>
+              <a *ngIf="p.panPath" [href]="apiUrl + p.panPath" target="_blank" class="doc-link">PAN Card</a>
+              <span *ngIf="!p.aadhaarPath && !p.panPath" style="color: var(--text-admin-muted);">No documents</span>
+            </div>
+          </td>
+
+          <!-- Account state -->
+          <td>
+            <span class="badge" [class.badge-success]="p.User?.status === 'Active'" [class.badge-danger]="p.User?.status === 'Suspended'" [class.badge-warning]="p.User?.status === 'Inactive'">
+              {{ p.User?.status }}
+            </span>
+          </td>
+
+          <!-- Action buttons -->
+          <td style="text-align: right;">
+            <div class="actions-group" style="display: inline-flex; gap: 8px;">
+              <!-- Accept/Reject commands -->
+              <ng-container *ngIf="p.kycStatus === 'Pending'">
+                <button (click)="verifyProvider(p.id, 'Rejected')" class="btn btn-danger btn-sm">Reject</button>
+                <button (click)="verifyProvider(p.id, 'Verified')" class="btn btn-success btn-sm">Verify Partner</button>
+              </ng-container>
+
+              <!-- Suspend/Unsuspend user account toggler -->
+              <button 
+                *ngIf="p.kycStatus === 'Verified' && p.User?.status === 'Active'" 
+                (click)="toggleSuspension(p.User?.id, 'Active')" 
+                class="btn btn-danger btn-sm"
+              >
+                Block Account
+              </button>
+              
+              <button 
+                *ngIf="p.User?.status === 'Suspended'" 
+                (click)="toggleSuspension(p.User?.id, 'Suspended')" 
+                class="btn btn-success btn-sm"
+              >
+                Unblock Account
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="providers().length === 0">
+          <td colspan="7" style="text-align: center; color: var(--text-admin-muted); padding: 30px;">
+            No service providers registered on the platform yet.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

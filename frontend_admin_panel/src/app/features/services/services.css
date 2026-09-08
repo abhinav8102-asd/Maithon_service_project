@@ -1,0 +1,27 @@
+.services-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 30px;
+  align-items: start;
+}
+
+.form-panel {
+  background-color: var(--bg-admin-card);
+  padding: 30px;
+}
+
+.form-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}

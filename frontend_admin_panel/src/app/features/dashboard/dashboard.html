@@ -1,0 +1,106 @@
+<div class="dashboard-widgets-container">
+  <!-- Analytics Grid -->
+  <div class="widget-grid">
+    <div class="widget-card">
+      <div class="widget-info">
+        <h4>Gross Platform Volume</h4>
+        <p>₹{{ stats().grossRevenue }}</p>
+      </div>
+      <div class="widget-icon">💰</div>
+    </div>
+    <div class="widget-card">
+      <div class="widget-info">
+        <h4>Platform Earnings (15%)</h4>
+        <p>₹{{ stats().platformCommission }}</p>
+      </div>
+      <div class="widget-icon">⚡</div>
+    </div>
+    <div class="widget-card">
+      <div class="widget-info">
+        <h4>Pending KYC Providers</h4>
+        <p>{{ stats().pendingProviders }}</p>
+      </div>
+      <div class="widget-icon" [style.background-color]="stats().pendingProviders > 0 ? '#fef3c7' : ''" [style.color]="stats().pendingProviders > 0 ? '#d97706' : ''">
+        ⚠️
+      </div>
+    </div>
+    <div class="widget-card">
+      <div class="widget-info">
+        <h4>Total Active Users</h4>
+        <p>{{ stats().totalUsers }}</p>
+      </div>
+      <div class="widget-icon">👥</div>
+    </div>
+  </div>
+
+  <!-- Dynamic daily bookings widget grid -->
+  <div class="widget-grid" style="margin-bottom: 40px;">
+    <div class="widget-card">
+      <div class="widget-info">
+        <h4>Bookings Placed Today</h4>
+        <p>{{ stats().bookingsToday }}</p>
+      </div>
+      <div class="widget-icon">📅</div>
+    </div>
+    <div class="widget-card">
+      <div class="widget-info">
+        <h4>Bookings This Month</h4>
+        <p>{{ stats().bookingsThisMonth }}</p>
+      </div>
+      <div class="widget-icon">📆</div>
+    </div>
+    <div class="widget-card">
+      <div class="widget-info">
+        <h4>Completed Jobs</h4>
+        <p>{{ stats().completedBookings }}</p>
+      </div>
+      <div class="widget-icon">✅</div>
+    </div>
+    <div class="widget-card">
+      <div class="widget-info">
+        <h4>Cancelled Requests</h4>
+        <p>{{ stats().cancelledBookings }}</p>
+      </div>
+      <div class="widget-icon">❌</div>
+    </div>
+  </div>
+
+  <!-- Recent Bookings Table -->
+  <div class="recent-bookings-panel card">
+    <h3>Recent Platform Bookings</h3>
+    
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Booking Date</th>
+            <th>Customer</th>
+            <th>Service Provider</th>
+            <th>Service Details</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of recentBookings()">
+            <td><strong>#{{ b.id }}</strong></td>
+            <td>{{ b.bookingDate }} ({{ b.bookingTime }})</td>
+            <td>{{ b.Customer?.User?.name }}</td>
+            <td>{{ b.Provider?.businessName || b.Provider?.User?.name }}</td>
+            <td>{{ b.Service?.name }}</td>
+            <td>₹{{ b.Service?.price }}</td>
+            <td>
+              <span class="badge" [class.badge-success]="b.status === 'Completed'" [class.badge-warning]="b.status === 'Pending'" [class.badge-info]="b.status === 'Accepted'" [class.badge-danger]="b.status === 'Cancelled' || b.status === 'Rejected'">
+                {{ b.status }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="recentBookings().length === 0">
+            <td colspan="7" style="text-align: center; color: var(--text-admin-muted);">No bookings found yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

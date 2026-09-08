@@ -1,0 +1,181 @@
+<div class="settings-panel">
+  <!-- Panel Header -->
+  <div class="panel-header card" style="margin-bottom: 30px;">
+    <h3>System & Platform Configurations</h3>
+    <p>Configure dynamic variables, business branding assets, and legal policy pages globally visible to consumers.</p>
+  </div>
+
+  <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="settings-form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 30px;">
+    
+    <!-- Left Column - General Branding & Social -->
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+      <!-- Branding Card -->
+      <div class="card">
+        <h4 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-admin); padding-bottom: 10px;">Branding & Logo</h4>
+        
+        <!-- Logo Upload -->
+        <div class="form-group" style="text-align: center;">
+          <label class="form-label" style="display: block; text-align: left; margin-bottom: 12px;">App Logo</label>
+          <div style="margin-bottom: 20px; display: inline-block; padding: 15px; border: 1.5px dashed var(--border-admin); border-radius: var(--radius-md); background: var(--bg-admin-main);">
+            <img 
+              [src]="logoPreview || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=60'" 
+              alt="Logo Preview" 
+              style="max-width: 150px; max-height: 80px; object-fit: contain; border-radius: var(--radius-sm);"
+            />
+          </div>
+          <input type="file" (change)="onLogoSelected($event)" class="form-control" />
+          <span style="font-size: 0.75rem; color: var(--text-admin-muted); display: block; margin-top: 8px;">Upload transparent PNG logo (Recommended: 200x80 pixels).</span>
+        </div>
+      </div>
+
+      <!-- Social Media Card -->
+      <div class="card">
+        <h4 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-admin); padding-bottom: 10px;">Social Platforms</h4>
+        
+        <!-- Facebook Link -->
+        <div class="form-group">
+          <label class="form-label">Facebook Profile Link</label>
+          <input type="url" formControlName="facebookLink" class="form-control" placeholder="https://facebook.com/yourpage" />
+        </div>
+
+        <!-- Instagram Link -->
+        <div class="form-group">
+          <label class="form-label">Instagram Profile Link</label>
+          <input type="url" formControlName="instagramLink" class="form-control" placeholder="https://instagram.com/yourhandle" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Contact & Address -->
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+      <!-- Contact Info Card -->
+      <div class="card" style="height: 100%;">
+        <h4 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-admin); padding-bottom: 10px;">Customer Service & Contact</h4>
+        
+        <!-- Contact Phone -->
+        <div class="form-group">
+          <label class="form-label">Support Phone Number</label>
+          <input type="text" formControlName="contactPhone" class="form-control" placeholder="+91 99999 99999" />
+        </div>
+
+        <!-- Contact Email -->
+        <div class="form-group">
+          <label class="form-label">Support Email Address</label>
+          <input type="email" formControlName="contactEmail" class="form-control" placeholder="support@localservice.com" />
+        </div>
+
+        <!-- Contact Address -->
+        <div class="form-group">
+          <label class="form-label">Physical Office Address</label>
+          <textarea formControlName="contactAddress" rows="4" class="form-control" placeholder="Complete address of headquarters..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Wide Columns - Policies (Span 2) -->
+    <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 30px;">
+      <!-- Legal Agreements Card -->
+      <div class="card">
+        <h4 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-admin); padding-bottom: 10px;">Platform Policies & Terms</h4>
+        
+        <!-- Privacy Policy -->
+        <div class="form-group">
+          <label class="form-label">Privacy Policy Statement</label>
+          <textarea formControlName="privacyPolicy" rows="8" class="form-control" placeholder="Detail your information collection and user security policy..."></textarea>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="form-group">
+          <label class="form-label">Terms & Conditions Agreement</label>
+          <textarea formControlName="termsConditions" rows="8" class="form-control" placeholder="Detail standard service operational agreements, booking refunds policy..."></textarea>
+        </div>
+      </div>
+
+      <!-- Homepage Customization Card -->
+      <div class="card">
+        <h4 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-admin); padding-bottom: 10px;">Homepage Hero Banner & Styles</h4>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+          <!-- Left: Hero Text inputs -->
+          <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="form-group">
+              <label class="form-label">Hero Banner Subtitle (Pill)</label>
+              <input type="text" formControlName="heroSubtitle" class="form-control" placeholder="e.g. SMART LOCAL SOLUTION" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Hero Banner Main Title</label>
+              <input type="text" formControlName="heroTitle" class="form-control" placeholder="e.g. LOCAL SERVICES & MAINTENANCE SYSTEM" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Hero Banner Description</label>
+              <textarea formControlName="heroDescription" rows="4" class="form-control" placeholder="Describe the platform purpose..."></textarea>
+            </div>
+          </div>
+
+          <!-- Right: Hero Banner BG Image upload -->
+          <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; border-left: 1px solid var(--border-admin); padding-left: 20px;">
+            <label class="form-label" style="align-self: flex-start; margin-bottom: 12px;">Hero Section Background Image</label>
+            <div style="margin-bottom: 15px; display: inline-block; padding: 10px; border: 1.5px dashed var(--border-admin); border-radius: var(--radius-md); background: var(--bg-admin-main); max-width: 100%; text-align: center;">
+              <img 
+                [src]="heroBgPreview || 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=300&auto=format&fit=crop&q=60'" 
+                alt="Hero BG Preview" 
+                style="max-width: 100%; max-height: 120px; object-fit: cover; border-radius: var(--radius-sm);"
+              />
+            </div>
+            <input type="file" (change)="onHeroBgSelected($event)" class="form-control" />
+            <span style="font-size: 0.72rem; color: var(--text-admin-muted); display: block; margin-top: 6px; text-align: center;">Upload modern dark background image (Recommended: 1920x800 pixels).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Section Data Card -->
+      <div class="card">
+        <h4 style="margin-bottom: 20px; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-admin); padding-bottom: 10px;">Homepage Dynamic Sections List (JSON)</h4>
+        <p style="font-size: 0.8rem; color: var(--text-admin-muted); margin-bottom: 20px; line-height: 1.4;">
+          💡 You can customize the layout text, icons, and structures dynamically. Make sure the JSON values are properly formatted lists. In case of syntax errors, the save button will be disabled.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+          <!-- Features List -->
+          <div class="form-group">
+            <label class="form-label">Features Grid JSON (6 cards)</label>
+            <textarea formControlName="featuresJson" rows="8" class="form-control" style="font-family: monospace; font-size: 0.8rem;" placeholder="[{'title': '...', 'description': '...', 'icon': '...'}]"></textarea>
+            <span *ngIf="settingsForm.get('featuresJson')?.hasError('invalidJson')" style="font-size: 0.72rem; color: var(--accent-danger); margin-top: 4px; display: block;">⚠️ Invalid JSON format. Please verify commas and quotes.</span>
+          </div>
+
+          <!-- Modules List -->
+          <div class="form-group">
+            <label class="form-label">Target Roles/Modules JSON (3 cards)</label>
+            <textarea formControlName="modulesJson" rows="8" class="form-control" style="font-family: monospace; font-size: 0.8rem;" placeholder="[{'title': '...', 'description': '...', 'image': '...', 'icon': '...'}]"></textarea>
+            <span *ngIf="settingsForm.get('modulesJson')?.hasError('invalidJson')" style="font-size: 0.72rem; color: var(--accent-danger); margin-top: 4px; display: block;">⚠️ Invalid JSON format. Please verify commas and quotes.</span>
+          </div>
+
+          <!-- Statistics Impact List -->
+          <div class="form-group">
+            <label class="form-label">Statistics Impact JSON (4 cards)</label>
+            <textarea formControlName="statsJson" rows="6" class="form-control" style="font-family: monospace; font-size: 0.8rem;" placeholder="[{'value': '...', 'label': '...', 'icon': '...'}]"></textarea>
+            <span *ngIf="settingsForm.get('statsJson')?.hasError('invalidJson')" style="font-size: 0.72rem; color: var(--accent-danger); margin-top: 4px; display: block;">⚠️ Invalid JSON format. Please verify commas and quotes.</span>
+          </div>
+
+          <!-- Workflow Steps List -->
+          <div class="form-group">
+            <label class="form-label">Workflow Steps JSON (4 steps)</label>
+            <textarea formControlName="workflowJson" rows="6" class="form-control" style="font-family: monospace; font-size: 0.8rem;" placeholder="[{'step': '...', 'title': '...', 'description': '...'}]"></textarea>
+            <span *ngIf="settingsForm.get('workflowJson')?.hasError('invalidJson')" style="font-size: 0.72rem; color: var(--accent-danger); margin-top: 4px; display: block;">⚠️ Invalid JSON format. Please verify commas and quotes.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel Footer -->
+      <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 10px;">
+        <button type="button" (click)="loadSettings()" class="btn btn-secondary" [disabled]="loading">Reset Forms</button>
+        <button type="submit" class="btn btn-primary" [disabled]="settingsForm.invalid || loading" style="padding: 12px 30px; font-size: 0.95rem;">
+          {{ loading ? 'Saving Settings...' : 'Save Configurations' }}
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>

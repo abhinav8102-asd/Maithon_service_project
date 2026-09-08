@@ -1,0 +1,14 @@
+{
+  "name": "maithon-service-project",
+  "version": "1.0.0",
+  "description": "Local Service Hub - Dhanbad/Maithon project root orchestration",
+  "scripts": {
+    "kill-ports": "node scripts/kill-port.js 4200 4201 5000",
+    "start:backend": "cd backend && npm run dev",
+    "start:user": "cd frontend_userSide && npm start",
+    "start:admin": "cd frontend_admin_panel && npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

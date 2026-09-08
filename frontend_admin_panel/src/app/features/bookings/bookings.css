@@ -1,0 +1,21 @@
+.bookings-panel {
+  padding: 30px;
+  background-color: var(--bg-admin-card);
+}
+
+.panel-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-admin-title);
+  margin-bottom: 4px;
+}
+
+.panel-header p {
+  font-size: 0.88rem;
+  color: var(--text-admin-muted);
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+}

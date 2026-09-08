@@ -1,0 +1,97 @@
+<div class="chats-monitoring-container container">
+  <h2>💬 Conversational Chat Monitor</h2>
+  <p class="subtitle-desc">Audit real-time messages and chat activity between customers and providers to handle
+    disputes.</p>
+
+  <div class="chats-monitor-layout card">
+    <!-- Left panel: Active Conversation logs -->
+    <div class="conversations-list-pane">
+      <div class="pane-header">
+        <h3>Active Conversations</h3>
+        <button (click)="loadConversations()" class="btn btn-outline btn-sm">Refresh List</button>
+      </div>
+
+      <div class="pane-list">
+        <div *ngIf="isConversationsLoading" class="chat-loading">
+          <div class="spinner"></div>
+          <span>Fetching conversation threads...</span>
+        </div>
+
+        <div *ngIf="conversations().length === 0 && !isConversationsLoading" class="no-conversations">
+          <p>No active message exchanges found on the platform yet.</p>
+        </div>
+
+        <div *ngFor="let c of conversations()" class="conversation-thread-item"
+          [class.active]="selectedConversation()?.userAId === c.userAId && selectedConversation()?.userBId === c.userBId"
+          (click)="selectConversation(c)">
+          <div class="thread-info">
+            <div class="participants-line">
+              <span class="user-a font-semibold">
+                {{ c.userAName }}
+                <small *ngIf="c.userABusinessName">({{ c.userABusinessName }})</small>
+              </span>
+              <span class="vs-text">↔</span>
+              <span class="user-b font-semibold">
+                {{ c.userBName }}
+                <small *ngIf="c.userBBusinessName">({{ c.userBBusinessName }})</small>
+              </span>
+            </div>
+            <div class="thread-preview-line">
+              <span class="msg-count-badge">{{ c.messageCount }} messages</span>
+              <span class="last-msg-preview-text">{{ c.lastMessage }}</span>
+            </div>
+            <span class="last-msg-time">{{ c.lastMessageTime | date:'medium' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel: Selected Conversation Thread logs -->
+    <div class="messages-history-pane">
+      <ng-container *ngIf="selectedConversation(); else selectPrompt">
+        <div class="pane-header">
+          <div class="active-participants">
+            <h3>Audit Log: {{ selectedConversation().userAName }} & {{ selectedConversation().userBName }}</h3>
+            <span>Total Messages: {{ activeMessages().length }}</span>
+          </div>
+        </div>
+
+        <div id="admin-chat-scroller" class="messages-scroll-window">
+          <div *ngIf="isHistoryLoading" class="chat-loading" style="padding-top: 60px;">
+            <div class="spinner"></div>
+            <span>Loading full thread audit logs...</span>
+          </div>
+
+          <div *ngFor="let m of activeMessages()" class="audit-msg-bubble-row"
+            [class.from-usera]="m.senderId === selectedConversation().userAId"
+            [class.from-userb]="m.senderId === selectedConversation().userBId">
+            <div class="audit-sender-tag">
+              {{ m.senderId === selectedConversation().userAId ? selectedConversation().userAName :
+              selectedConversation().userBName }}
+            </div>
+            <div class="audit-bubble">
+              <!-- Attached image if exists -->
+              <div class="media-preview" *ngIf="m.mediaUrl">
+                <img [src]="backendUrl + m.mediaUrl" alt="Media Attachment" class="shared-img" />
+              </div>
+              <p class="msg-content" *ngIf="m.messageText">{{ m.messageText }}</p>
+              <div class="msg-meta-row">
+                <span class="msg-time">{{ m.createdAt | date:'shortTime' }}</span>
+                <span class="read-receipt" [class.is-read]="m.isRead">✓{{ m.isRead ? '✓' : '' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #selectPrompt>
+        <div class="select-thread-placeholder">
+          <div class="placeholder-icon">📬</div>
+          <h3>No Conversation Selected</h3>
+          <p>Click on any of the active conversation threads on the left panel to audit their full real-time message
+            logs.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

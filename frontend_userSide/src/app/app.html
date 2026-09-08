@@ -1,0 +1,167 @@
+<!-- Navigation Header -->
+<header class="navbar-header">
+  <div class="nav-container">
+    <div class="logo-group" routerLink="/" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+      <img *ngIf="settings?.logo" [src]="apiUrl + settings.logo" alt="Logo" style="height: 40px; max-width: 145px; object-fit: contain;">
+      <div *ngIf="!settings?.logo" style="display: flex; flex-direction: column;">
+        <span class="logo-title">Local Service Hub</span>
+        <span class="logo-location">Maithon</span>
+      </div>
+    </div>
+
+    <!-- Navigation Menus -->
+    <nav class="nav-links">
+      <!-- Guest Links -->
+      <ng-container *ngIf="!authService.isLoggedIn()">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        <a routerLink="/auth/login" class="btn btn-outline" style="padding: 6px 16px;">Login</a>
+        <a routerLink="/auth/register" class="btn btn-primary" style="padding: 6px 16px;">Become a Partner</a>
+      </ng-container>
+
+      <!-- Customer Links -->
+      <ng-container *ngIf="authService.isLoggedIn() && authService.getRole() === 'Customer'">
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Find Services</a>
+        <a routerLink="/customer/bookings" routerLinkActive="active">My Bookings</a>
+        <a routerLink="/chat" routerLinkActive="active" class="nav-messages-link">
+          Messages
+          <span class="nav-unread-badge" *ngIf="chatService.totalUnreadCount() > 0">
+            {{ chatService.totalUnreadCount() > 99 ? '99+' : chatService.totalUnreadCount() }}
+          </span>
+        </a>
+        <a routerLink="/customer/favorites" routerLinkActive="active">Favorites</a>
+        <a routerLink="/customer/profile" routerLinkActive="active" class="user-profile-btn">
+          <i class="avatar-placeholder">C</i>
+          <span>{{ authService.currentUser()?.name }}</span>
+        </a>
+        <button (click)="logout()" class="btn btn-outline" style="padding: 6px 14px;">Logout</button>
+      </ng-container>
+
+      <!-- Provider Links -->
+      <ng-container *ngIf="authService.isLoggedIn() && authService.getRole() === 'Provider'">
+        <a routerLink="/provider/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/provider/bookings" routerLinkActive="active">Manage Bookings</a>
+        <a routerLink="/chat" routerLinkActive="active" class="nav-messages-link">
+          Messages
+          <span class="nav-unread-badge" *ngIf="chatService.totalUnreadCount() > 0">
+            {{ chatService.totalUnreadCount() > 99 ? '99+' : chatService.totalUnreadCount() }}
+          </span>
+        </a>
+        <a routerLink="/provider/kyc" routerLinkActive="active">KYC verification</a>
+        <a routerLink="/provider/profile" routerLinkActive="active" class="user-profile-btn">
+          <i class="avatar-placeholder provider-avatar">P</i>
+          <span>{{ authService.currentUser()?.name }}</span>
+        </a>
+        <button (click)="logout()" class="btn btn-outline" style="padding: 6px 14px;">Logout</button>
+      </ng-container>
+
+      <!-- Theme Switcher Button -->
+      <button (click)="toggleTheme()" class="theme-toggle-btn" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        {{ isDarkMode ? '☀️' : '🌙' }}
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- Global Toast Notification Banner for Chat Messages -->
+<div class="toast-notification-banner" *ngIf="activeToast()" (click)="navigateToToastChat()">
+  <div class="toast-icon">💬</div>
+  <div class="toast-content">
+    <h5>New message from {{ activeToast().senderName }}</h5>
+    <p>{{ activeToast().messageText }}</p>
+  </div>
+  <button class="toast-close" (click)="$event.stopPropagation(); activeToast.set(null)">×</button>
+</div>
+
+<!-- Main Router Content -->
+<main class="main-body">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Footer Section -->
+<footer class="main-footer">
+  <div class="footer-container">
+    <div class="footer-column branding">
+      <img *ngIf="settings?.logo" [src]="apiUrl + settings.logo" alt="Logo" style="max-height: 40px; margin-bottom: 12px; object-fit: contain;">
+      <h3 *ngIf="!settings?.logo">Local Service Hub</h3>
+      <p>Connecting trust and local talents near you in Maithon Dam, Jharkhand &amp; border Bengal regions.</p>
+      <p style="font-size: 0.82rem; margin-top: 12px; color: var(--text-muted); line-height: 1.4;" *ngIf="settings?.contactAddress">
+        📍 {{ settings.contactAddress }}
+      </p>
+    </div>
+    <div class="footer-column links">
+      <h4>Support &amp; Info</h4>
+      <!-- Policy buttons — open popup instead of navigating -->
+      <button class="footer-policy-btn" (click)="openPolicy('terms')">Terms of Service</button>
+      <button class="footer-policy-btn" (click)="openPolicy('privacy')">Privacy Policy</button>
+      <span *ngIf="settings?.contactPhone" style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 8px;">
+        📞 Call Support: {{ settings.contactPhone }}
+      </span>
+      <span *ngIf="settings?.contactEmail" style="font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 4px;">
+        ✉️ Email: {{ settings.contactEmail }}
+      </span>
+      <!-- Social Networks Link Icons -->
+      <div style="display: flex; gap: 15px; margin-top: 15px;">
+        <a *ngIf="settings?.facebookLink" [href]="settings.facebookLink" target="_blank" style="text-decoration: none; font-size: 1.3rem;">📘</a>
+        <a *ngIf="settings?.instagramLink" [href]="settings.instagramLink" target="_blank" style="text-decoration: none; font-size: 1.3rem;">📸</a>
+      </div>
+    </div>
+    <div class="footer-column copyright">
+      <p>© 2026 Local Service Hub. Made for final year project demonstration.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== POLICY MODAL ===== -->
+<div class="policy-modal-backdrop" *ngIf="policyModalOpen" (click)="closePolicy()">
+  <div class="policy-modal-box" (click)="$event.stopPropagation()">
+    <div class="policy-modal-header">
+      <h2 class="policy-modal-title">{{ policyModalTitle }}</h2>
+      <button class="policy-modal-close" (click)="closePolicy()" aria-label="Close">✕</button>
+    </div>
+    <div class="policy-modal-divider"></div>
+    <div class="policy-modal-body">
+      <p class="policy-modal-text">{{ policyModalContent }}</p>
+    </div>
+    <div class="policy-modal-footer">
+      <button class="policy-close-btn" (click)="closePolicy()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== GLOBAL TOAST NOTIFICATION STACK ===== -->
+<div class="global-toast-stack" aria-live="polite">
+  <div
+    *ngFor="let toast of toastService.toasts()"
+    class="gtoast-item"
+    [class.gtoast-success]="toast.type === 'success'"
+    [class.gtoast-error]="toast.type === 'error'"
+    [class.gtoast-warning]="toast.type === 'warning'"
+    [class.gtoast-info]="toast.type === 'info'"
+    (click)="toastService.remove(toast.id)"
+  >
+    <span class="gtoast-icon">
+      <span *ngIf="toast.type === 'success'">✅</span>
+      <span *ngIf="toast.type === 'error'">❌</span>
+      <span *ngIf="toast.type === 'warning'">⚠️</span>
+      <span *ngIf="toast.type === 'info'">ℹ️</span>
+    </span>
+    <span class="gtoast-message">{{ toast.message }}</span>
+    <button class="gtoast-close" (click)="$event.stopPropagation(); toastService.remove(toast.id)">×</button>
+  </div>
+</div>
+
+<!-- ===== GLOBAL CONFIRM DIALOG ===== -->
+<div class="gconfirm-backdrop" *ngIf="toastService.confirmDialog()" (click)="toastService.resolveConfirm(false)">
+  <div class="gconfirm-box" (click)="$event.stopPropagation()">
+    <div class="gconfirm-icon">🤔</div>
+    <p class="gconfirm-message">{{ toastService.confirmDialog()?.message }}</p>
+    <div class="gconfirm-actions">
+      <button class="btn btn-outline gconfirm-cancel" (click)="toastService.resolveConfirm(false)">
+        {{ toastService.confirmDialog()?.cancelText }}
+      </button>
+      <button class="btn btn-primary gconfirm-ok" (click)="toastService.resolveConfirm(true)">
+        {{ toastService.confirmDialog()?.confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

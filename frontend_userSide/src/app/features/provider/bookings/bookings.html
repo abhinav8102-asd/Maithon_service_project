@@ -1,0 +1,64 @@
+<div class="bookings-container container">
+  <h2>Manage Service Bookings</h2>
+
+  <!-- Filter tabs -->
+  <div class="tabs-nav card">
+    <button [class.active]="activeTab === 'All'" (click)="filterTab('All')">All Requests</button>
+    <button [class.active]="activeTab === 'Pending'" (click)="filterTab('Pending')">Pending</button>
+    <button [class.active]="activeTab === 'Accepted'" (click)="filterTab('Accepted')">Accepted</button>
+    <button [class.active]="activeTab === 'Completed'" (click)="filterTab('Completed')">Completed</button>
+    <button [class.active]="activeTab === 'Cancelled'" (click)="filterTab('Cancelled')">Cancelled</button>
+  </div>
+
+  <!-- Bookings List -->
+  <div *ngIf="filteredBookings().length === 0" class="no-bookings card">
+    <p>No bookings received under this category.</p>
+  </div>
+
+  <div class="bookings-list" *ngIf="filteredBookings().length > 0">
+    <div *ngFor="let b of filteredBookings()" class="booking-card card">
+      <div class="booking-card-header">
+        <div class="service-info">
+          <h3>{{ b.Service?.name }}</h3>
+          <p class="booking-date">Date: {{ b.bookingDate }} | Time: {{ b.bookingTime }}</p>
+        </div>
+        <span class="badge" [class.badge-warning]="b.status === 'Pending'" [class.badge-info]="b.status === 'Accepted'" [class.badge-success]="b.status === 'Completed'" [class.badge-danger]="b.status === 'Cancelled' || b.status === 'Rejected'">
+          {{ b.status }}
+        </span>
+      </div>
+
+      <div class="booking-card-body">
+        <div class="detail-section">
+          <p><strong>Customer Name:</strong> {{ b.Customer?.User?.name }}</p>
+          <p><strong>Contact Phone:</strong> {{ b.Customer?.User?.phoneNumber }}</p>
+          <p><strong>Service Location:</strong> {{ b.address }}, {{ b.pincode }}</p>
+        </div>
+        <div class="price-section">
+          <p class="price-label">Payout Amount</p>
+          <p class="price-value">₹{{ b.price }}</p>
+          <span class="badge badge-success" style="font-size: 0.65rem;" *ngIf="b.Payment?.status === 'Paid'">COLLECTED</span>
+          <span class="badge badge-warning" style="font-size: 0.65rem;" *ngIf="b.Payment?.status === 'Pending'">COD (PENDING)</span>
+        </div>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="booking-card-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <!-- Chat Action -->
+        <a [routerLink]="['/chat', b.Customer?.userId]" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none;" *ngIf="b.Customer?.userId">
+          💬 Chat with Customer
+        </a>
+
+        <!-- Accept / Reject Actions -->
+        <ng-container *ngIf="b.status === 'Pending'">
+          <button (click)="updateStatus(b.id, 'Rejected')" class="btn btn-outline btn-sm">Reject Request</button>
+          <button (click)="updateStatus(b.id, 'Accepted')" class="btn btn-primary btn-sm">Accept Request</button>
+        </ng-container>
+
+        <!-- Complete Action -->
+        <ng-container *ngIf="b.status === 'Accepted'">
+          <button (click)="updateStatus(b.id, 'Completed')" class="btn btn-success btn-sm">Mark Service Completed</button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

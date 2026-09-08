@@ -1,0 +1,79 @@
+.favorites-container {
+  padding: 40px 20px;
+}
+
+.favorites-container h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--secondary-color);
+  margin-bottom: 30px;
+  letter-spacing: -0.5px;
+}
+
+.no-favorites {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+/* Favorites Grid */
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.fav-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.fav-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.fav-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+}
+
+.fav-title h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.locality {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.fav-body {
+  flex-grow: 1;
+  margin-bottom: 20px;
+}
+
+.fav-body p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.fav-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}

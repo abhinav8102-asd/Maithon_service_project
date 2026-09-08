@@ -1,0 +1,67 @@
+<div class="bookings-panel card">
+  <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <h3>All Platform bookings</h3>
+      <p>Monitor, audit, and cancel service booking orders running on the marketplace.</p>
+    </div>
+
+    <!-- Filter dropdown -->
+    <div class="filter-box" style="width: 200px;">
+      <select [(ngModel)]="activeFilter" (change)="applyFilter()" class="form-control">
+        <option value="">All Bookings</option>
+        <option value="Pending">Pending</option>
+        <option value="Accepted">Accepted</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Booking ID</th>
+          <th>Order Date & Time</th>
+          <th>Customer Name</th>
+          <th>Service Provider</th>
+          <th>Service Item</th>
+          <th>Fare (₹)</th>
+          <th>Status</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let b of filteredBookings()">
+          <td><strong>#{{ b.id }}</strong></td>
+          <td>{{ b.bookingDate }} ({{ b.bookingTime }})</td>
+          <td>{{ b.Customer?.User?.name }}</td>
+          <td>{{ b.Provider?.businessName || b.Provider?.User?.name }}</td>
+          <td>{{ b.Service?.name }}</td>
+          <td><strong>₹{{ b.Service?.price }}</strong></td>
+          <td>
+            <span class="badge" [class.badge-success]="b.status === 'Completed'" [class.badge-warning]="b.status === 'Pending'" [class.badge-info]="b.status === 'Accepted'" [class.badge-danger]="b.status === 'Cancelled' || b.status === 'Rejected'">
+              {{ b.status }}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <!-- Admin cancellation action -->
+            <button 
+              *ngIf="b.status === 'Pending' || b.status === 'Accepted'" 
+              (click)="cancelBooking(b.id)" 
+              class="btn btn-danger btn-sm"
+            >
+              Cancel
+            </button>
+            <span *ngIf="b.status === 'Completed' || b.status === 'Cancelled' || b.status === 'Rejected'" style="color: var(--text-admin-muted); font-size: 0.85rem;">None</span>
+          </td>
+        </tr>
+        <tr *ngIf="filteredBookings().length === 0">
+          <td colspan="8" style="text-align: center; color: var(--text-admin-muted); padding: 30px;">
+            No bookings found matching filter parameters.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

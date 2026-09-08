@@ -1,0 +1,493 @@
+<!-- Hero Banner Section -->
+<section class="hero-section" [style.backgroundImage]="settings()?.heroBgImage ? 'linear-gradient(to right, rgba(7, 10, 19, 0.92), rgba(7, 10, 19, 0.75)), url(' + apiUrl + settings()?.heroBgImage + ')' : 'linear-gradient(to right, rgba(7, 10, 19, 0.92), rgba(7, 10, 19, 0.75)), url(https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200&auto=format&fit=crop&q=80)'">
+  <div class="hero-container container">
+    <!-- Left Hero Info -->
+    <div class="hero-text-block">
+      <div class="hero-pill-badge" *ngIf="settings()?.heroSubtitle">
+        {{ settings()?.heroSubtitle }}
+      </div>
+      <h1 class="hero-title" *ngIf="settings()?.heroTitle">
+        {{ settings()?.heroTitle }}
+      </h1>
+      <p class="hero-desc" *ngIf="settings()?.heroDescription">
+        {{ settings()?.heroDescription }}
+      </p>
+      
+      <div class="hero-buttons">
+        <button (click)="quickSearch()" class="btn btn-primary btn-hero-lg">Get Started</button>
+        <a href="#features-section" class="btn btn-outline btn-hero-lg explore-btn">Explore Features <span class="arrow-symbol">→</span></a>
+      </div>
+    </div>
+
+    <!-- Right Quick Search/Booking Floating Card -->
+    <div class="hero-quick-card-container">
+      <div class="quick-finder-card">
+        <h3>Quick Service Finder</h3>
+        <p class="quick-card-subtitle">Find local verified partners and place service requests instantly.</p>
+        
+        <div class="quick-form-group">
+          <label class="quick-form-label">
+            <span class="icon">🔍</span> Select Category
+          </label>
+          <select [(ngModel)]="selectedCategory" class="quick-form-control">
+            <option value="">Choose Service Category</option>
+            <option *ngFor="let cat of categories()" [value]="cat.id">{{ cat.name }}</option>
+          </select>
+        </div>
+
+        <div class="quick-form-group">
+          <label class="quick-form-label">
+            <span class="icon">📍</span> Select City
+          </label>
+          <select [(ngModel)]="selectedCity" (change)="onCityChange()" class="quick-form-control">
+            <option value="">Choose Location City</option>
+            <option *ngFor="let city of cities()" [value]="city.id">{{ city.name }} ({{ city.state }})</option>
+          </select>
+        </div>
+
+        <div class="quick-form-group">
+          <label class="quick-form-label">
+            <span class="icon">🏘️</span> Select Locality / Area
+          </label>
+          <select [(ngModel)]="selectedArea" class="quick-form-control" [disabled]="!selectedCity">
+            <option value="">All Locality Areas</option>
+            <option *ngFor="let area of areas()" [value]="area.id">{{ area.name }} - {{ area.pincode }}</option>
+          </select>
+        </div>
+
+        <button (click)="quickSearch()" class="btn btn-primary btn-block submit-complaint-btn">
+          Search Services Now
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us Features Grid Section -->
+<section id="features-section" class="why-choose-section container">
+  <div class="section-header-centered">
+    <span class="section-subtitle-pill">Why Choose Us</span>
+    <h2>Powerful Features for a Smarter Service</h2>
+    <p class="section-lead-desc">We bring efficiency, transparency and speed to local maintenance with smart features and real-time tracking.</p>
+  </div>
+
+  <div class="features-grid">
+    <div *ngFor="let feat of featuresList()" class="feature-card">
+      <div class="feat-icon-box">
+        <span class="feat-icon">{{ feat.icon || '🛠️' }}</span>
+      </div>
+      <h3>{{ feat.title }}</h3>
+      <p>{{ feat.description }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Modules Role Section -->
+<section class="modules-section">
+  <div class="modules-container container">
+    <div class="section-header-centered">
+      <span class="section-subtitle-pill">Modules</span>
+      <h2>Built for Everyone in the Community</h2>
+    </div>
+
+    <div class="modules-grid">
+      <div *ngFor="let mod of modulesList()" class="module-card">
+        <div class="module-img-wrapper">
+          <img [src]="mod.image" [alt]="mod.title">
+        </div>
+        <div class="module-content">
+          <div class="module-icon-pill">
+            <span class="module-icon">{{ mod.icon || '👤' }}</span>
+          </div>
+          <h3>{{ mod.title }}</h3>
+          <p>{{ mod.description }}</p>
+          <a (click)="quickSearch()" class="module-link">Learn more <span class="arrow-symbol">→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="workflow-section container">
+  <div class="section-header-centered">
+    <span class="section-subtitle-pill">How It Works</span>
+    <h2>Simple Workflow, Maximum Efficiency</h2>
+  </div>
+
+  <div class="workflow-steps">
+    <!-- Horizontal connector line (visible on desktop) -->
+    <div class="workflow-connector"></div>
+
+    <div *ngFor="let step of workflowList(); let i = index" class="workflow-step-item">
+      <div class="step-badge-circle">
+        <span class="step-num">{{ step.step || (i + 1) }}</span>
+      </div>
+      <h3>{{ step.title }}</h3>
+      <p>{{ step.description }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Dashboard Mockup Section -->
+<section class="dashboard-mockup-section">
+  <div class="dashboard-container container">
+    <!-- Left Info Column -->
+    <div class="dashboard-info-column">
+      <span class="section-subtitle-pill">Dashboard Overview</span>
+      <h2>Insights at Your Fingertips</h2>
+      <p>Our powerful real-time dashboards allow administrators, customers, and providers to stay aligned. Track booking statuses, payments, and ratings seamlessly in one single view.</p>
+      
+      <a routerLink="/auth/login" class="btn btn-primary inline-dashboard-btn" *ngIf="!authService.isLoggedIn()">View Dashboard <span class="arrow-symbol">→</span></a>
+      <a routerLink="/provider/dashboard" class="btn btn-primary inline-dashboard-btn" *ngIf="authService.isLoggedIn() && authService.getRole() === 'Provider'">Go to Dashboard <span class="arrow-symbol">→</span></a>
+      <a routerLink="/customer/bookings" class="btn btn-primary inline-dashboard-btn" *ngIf="authService.isLoggedIn() && authService.getRole() === 'Customer'">My Bookings <span class="arrow-symbol">→</span></a>
+    </div>
+
+    <!-- Right Dashboard UI Mockup Column -->
+    <div class="dashboard-visual-column">
+      <div class="mock-dashboard-card">
+        <!-- Mock Top Bar -->
+        <div class="mock-db-top">
+          <div class="mock-logo-brand">
+            <span class="orange-dot"></span>
+            <span class="logo-txt">LocalServiceHub</span>
+          </div>
+          <div class="mock-db-search">
+            <span class="search-ic">🔍</span> Search anything...
+          </div>
+          <div class="mock-profile-pill">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&auto=format&fit=crop&q=60" alt="avatar" class="mock-avatar">
+            <span class="mock-profile-name">Rahul Sharma</span>
+          </div>
+        </div>
+
+        <div class="mock-db-workspace">
+          <!-- Mock Stats Grid -->
+          <div class="mock-stats-grid">
+            <div class="mock-stat-box total">
+              <span class="stat-lbl">Total Bookings</span>
+              <span class="stat-val">1,248</span>
+              <span class="stat-change up">▲ 12.3% from last month</span>
+            </div>
+            <div class="mock-stat-box pending">
+              <span class="stat-lbl">Pending Request</span>
+              <span class="stat-val">342</span>
+              <span class="stat-change up">▲ 5.1% from last month</span>
+            </div>
+            <div class="mock-stat-box progress">
+              <span class="stat-lbl">In Progress</span>
+              <span class="stat-val">278</span>
+              <span class="stat-change down">▼ 2.4% from last month</span>
+            </div>
+            <div class="mock-stat-box completed">
+              <span class="stat-lbl">Completed</span>
+              <span class="stat-val">628</span>
+              <span class="stat-change up">▲ 18.7% from last month</span>
+            </div>
+          </div>
+
+          <!-- Mock Charts Grid -->
+          <div class="mock-charts-grid">
+            <!-- Line Graph -->
+            <div class="mock-chart-card">
+              <h4>Bookings Overview</h4>
+              <div class="mock-graph-container">
+                <!-- Visual SVG Vector representing line chart -->
+                <svg viewBox="0 0 400 150" class="graph-svg">
+                  <!-- Grid Lines -->
+                  <line x1="0" y1="30" x2="400" y2="30" stroke="rgba(255,255,255,0.05)" />
+                  <line x1="0" y1="75" x2="400" y2="75" stroke="rgba(255,255,255,0.05)" />
+                  <line x1="0" y1="120" x2="400" y2="120" stroke="rgba(255,255,255,0.05)" />
+                  
+                  <!-- Area path under orange line -->
+                  <path d="M 0 150 L 0 130 Q 80 140 120 90 T 240 60 T 320 100 T 400 35 L 400 150 Z" fill="url(#orange-glow-grad)" opacity="0.15" />
+                  
+                  <!-- Line path -->
+                  <path d="M 0 130 Q 80 140 120 90 T 240 60 T 320 100 T 400 35" fill="none" stroke="#ff5722" stroke-width="3" stroke-linecap="round" />
+                  
+                  <!-- Grid Gradient definitions -->
+                  <defs>
+                    <linearGradient id="orange-glow-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#ff5722" />
+                      <stop offset="100%" stop-color="transparent" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="graph-months">
+                  <span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pie Chart Ring -->
+            <div class="mock-chart-card donut">
+              <h4>Top Categories</h4>
+              <div class="mock-donut-container">
+                <div class="donut-visual">
+                  <svg viewBox="0 0 100 100" class="donut-svg">
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="12" />
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="#ff5722" stroke-width="12" stroke-dasharray="140 220" stroke-dashoffset="0" />
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="#ffb74d" stroke-width="12" stroke-dasharray="50 220" stroke-dashoffset="-140" />
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="#10b981" stroke-width="12" stroke-dasharray="30 220" stroke-dashoffset="-190" />
+                  </svg>
+                  <div class="donut-center">
+                    <span class="donut-val">1,248</span>
+                    <span class="donut-lbl">Total</span>
+                  </div>
+                </div>
+                <div class="donut-legends">
+                  <div class="legend-row"><span class="bullet electrical"></span> Electrical (58%)</div>
+                  <div class="legend-row"><span class="bullet plumbing"></span> Plumbing (23%)</div>
+                  <div class="legend-row"><span class="bullet cleaning"></span> Cleaning (19%)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Impact Section -->
+<section class="stats-impact-section container">
+  <div class="stats-glowing-wrapper">
+    <div class="stats-header">
+      <span class="section-subtitle-pill">Our Impact</span>
+      <h2>Making Services Better Every Day</h2>
+      <p>We are committed to building smarter local service ecosystems through technology and continuous improvement.</p>
+    </div>
+    
+    <div class="stats-counters-grid">
+      <div *ngFor="let stat of statsList()" class="stat-counter-card">
+        <span class="stat-counter-icon">{{ stat.icon || '📈' }}</span>
+        <span class="stat-counter-number">{{ stat.value }}</span>
+        <span class="stat-counter-label">{{ stat.label }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Dynamic Bottom CTA -->
+<section class="bottom-cta-banner-strip">
+  <div class="cta-banner-container container">
+    <h2>Let's Build a Better Service Experience Together</h2>
+    <p>Join hundreds of local families and professionals using our platform to streamline home maintenance and resolve issue requests.</p>
+    <button (click)="quickSearch()" class="btn btn-secondary btn-cta-dark">Get Started Now</button>
+  </div>
+</section>
+
+<!-- Search Results & Providers Grid -->
+<section id="results-section" class="providers-section container">
+  <div class="results-title-bar">
+    <h2 class="section-title">Verified Partners in Maithon</h2>
+    <p class="results-desc-subtitle">Browse profile details, experience levels, ratings and book services directly.</p>
+  </div>
+  
+  <!-- Filter refinements panel on the fly -->
+  <div class="refinement-filter-bar card">
+    <div class="refine-row">
+      <div class="refine-group">
+        <label>Filter Locality</label>
+        <select [(ngModel)]="selectedArea" (change)="search()" class="form-control refine-select">
+          <option value="">All Locality Areas</option>
+          <option *ngFor="let area of areas()" [value]="area.id">{{ area.name }} ({{ area.pincode }})</option>
+        </select>
+      </div>
+
+      <div class="refine-group flex-2">
+        <label>Keyword Search</label>
+        <input 
+          type="text" 
+          [(ngModel)]="searchName" 
+          placeholder="Search business, services or provider name..." 
+          class="form-control refine-input"
+          (input)="search()"
+        />
+      </div>
+
+      <div class="refine-actions">
+        <button (click)="resetFilters()" class="btn btn-outline">Reset Filter</button>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="providers().length === 0" class="no-results-panel card">
+    <div class="no-results-icon">🔍</div>
+    <h3>No Service Partners Found</h3>
+    <p>No verified service providers found matching your filter selection. Try changing the location filters or clearing the search terms.</p>
+    <button (click)="resetFilters()" class="btn btn-outline" style="margin-top: 15px;">Clear Filter Settings</button>
+  </div>
+
+  <div class="providers-grid" *ngIf="providers().length > 0">
+    <div *ngFor="let p of providers()" class="provider-card card card-hover" [class.featured-provider-card]="p.isFeatured">
+      <div class="card-featured-badge" *ngIf="p.isFeatured">⭐ Featured Partner</div>
+      
+      <div class="provider-card-header">
+        <img 
+          [src]="p.User?.Customer?.profilePicture ? (apiUrl + p.User.Customer.profilePicture) : 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=120&auto=format&fit=crop&q=60'" 
+          alt="Avatar" 
+          class="provider-img"
+        />
+        <div class="provider-title">
+          <h3>{{ p.User?.name }}</h3>
+          <p class="provider-biz-subtitle">
+            {{ p.businessName }}
+          </p>
+          <span class="badge badge-success" *ngIf="p.kycStatus === 'Verified'">Verified</span>
+        </div>
+      </div>
+
+      <div class="provider-card-body">
+        <p class="provider-meta"><strong>Experience:</strong> {{ p.experienceYears }} Years</p>
+        <p class="provider-meta"><strong>Location:</strong> {{ p.Area?.name }}, {{ p.City?.name }}</p>
+        <p class="provider-meta"><strong>Base Pricing:</strong> <span class="price-highlight">₹{{ p.pricing }}</span></p>
+        
+        <!-- Rating system visualization -->
+        <div class="rating-box">
+          <span class="star-rating">★</span>
+          <span class="rating-value">{{ p.averageRating > 0 ? p.averageRating : 'New' }}</span>
+          <span class="rating-count" *ngIf="p.totalReviews > 0">({{ p.totalReviews }} reviews)</span>
+        </div>
+
+        <div class="services-offered" *ngIf="p.services && p.services.length > 0">
+          <span class="service-pill" *ngFor="let s of p.services">{{ s.name }} (₹{{ s.price }})</span>
+        </div>
+      </div>
+
+      <div class="provider-card-actions">
+        <button (click)="openBooking(p)" class="btn btn-primary book-now-action-btn">Book Service Now</button>
+        <a [routerLink]="['/chat', p.userId]" class="btn btn-outline chat-now-action-btn" title="Chat Now">
+          💬 Chat
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Support & Helpdesk Panel -->
+<section class="support-section container">
+  <div class="support-grid">
+    <div class="support-info">
+      <h2>Need Custom Support?</h2>
+      <p>Having trouble booking or have custom service requirements? Send a message to our administrator desk, and we will get back to you immediately.</p>
+      
+      <div class="helpline-details">
+        <div class="helpline-row" *ngIf="settings()?.contactEmail">
+          <span class="help-icon">✉️</span> 
+          <div>
+            <strong>Admin Support Email</strong>
+            <p>{{ settings()?.contactEmail }}</p>
+          </div>
+        </div>
+        <div class="helpline-row" *ngIf="settings()?.contactPhone">
+          <span class="help-icon">📞</span> 
+          <div>
+            <strong>Emergency Helpline</strong>
+            <p>{{ settings()?.contactPhone }}</p>
+          </div>
+        </div>
+        <div class="helpline-row" *ngIf="settings()?.contactAddress">
+          <span class="help-icon">📍</span> 
+          <div>
+            <strong>Headquarters</strong>
+            <p>{{ settings()?.contactAddress }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="support-form-card card">
+      <h3>Submit Query Message</h3>
+      <div *ngIf="supportSuccess" class="success-alert">
+        Your query message has been logged successfully!
+      </div>
+
+      <form [formGroup]="supportForm" (ngSubmit)="submitSupport()">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" formControlName="name" class="form-control" placeholder="e.g. Ajay Kumar" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" formControlName="email" class="form-control" placeholder="ajay@gmail.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Detail Message</label>
+          <textarea formControlName="message" rows="3" class="form-control" placeholder="Describe your query..."></textarea>
+        </div>
+        <button type="submit" [disabled]="supportForm.invalid" class="btn btn-primary btn-block">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Dynamic Booking Overlay Modal -->
+<div class="modal-backdrop" *ngIf="showBookingModal">
+  <div class="booking-modal card">
+    <div class="modal-header">
+      <h3>Book Service: {{ selectedProviderForBooking?.businessName || selectedProviderForBooking?.User?.name }}</h3>
+      <button (click)="closeBooking()" class="close-btn">&times;</button>
+    </div>
+
+    <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
+      <div class="modal-body">
+        <!-- Choose Service -->
+        <div class="form-group">
+          <label class="form-label">Select Service Listing</label>
+          <select formControlName="serviceId" class="form-control">
+            <option value="">-- Choose Offered Service --</option>
+            <option *ngFor="let s of selectedProviderForBooking?.services" [value]="s.id">
+              {{ s.name }} (₹{{ s.price }})
+            </option>
+          </select>
+        </div>
+
+        <div class="modal-split">
+          <!-- Booking Date -->
+          <div class="form-group">
+            <label class="form-label">Service Date</label>
+            <input type="date" formControlName="bookingDate" class="form-control" />
+          </div>
+          <!-- Booking Time Slot -->
+          <div class="form-group">
+            <label class="form-label">Preferred Time Slot</label>
+            <select formControlName="bookingTime" class="form-control">
+              <option value="">-- Choose Slot --</option>
+              <option value="09:00 AM - 11:00 AM">09:00 AM - 11:00 AM</option>
+              <option value="11:00 AM - 01:00 PM">11:00 AM - 01:00 PM</option>
+              <option value="02:00 PM - 04:00 PM">02:00 PM - 04:00 PM</option>
+              <option value="04:00 PM - 06:00 PM">04:00 PM - 06:00 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group">
+          <label class="form-label">Full Delivery Address</label>
+          <textarea formControlName="address" rows="2" class="form-control" placeholder="House name, street detail..."></textarea>
+        </div>
+
+        <!-- Pincode -->
+        <div class="form-group">
+          <label class="form-label">Pincode (6 digits)</label>
+          <input type="text" formControlName="pincode" class="form-control" placeholder="828207" />
+        </div>
+
+        <!-- Payment Method -->
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <select formControlName="paymentMethod" class="form-control">
+            <option value="Cash">Cash on Delivery (COD)</option>
+            <option value="UPI">UPI Payment (pay after service)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="closeBooking()" class="btn btn-outline">Cancel</button>
+        <button type="submit" [disabled]="bookingForm.invalid" class="btn btn-primary">Confirm Booking</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+# Dependency directories
+node_modules/
+
+# Environment files
+.env
+
+# Local upload files
+uploads/
+
+# Log files
+*.log
+npm-debug.log*
+
+# Editor files and folders
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

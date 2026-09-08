@@ -1,0 +1,160 @@
+<div class="chat-layout container">
+  
+  <!-- LEFT PANEL: INBOX CONVERSATIONS LIST -->
+  <div class="chat-inbox-panel card">
+    <div class="inbox-header">
+      <h3>Conversations Inbox</h3>
+    </div>
+    
+    <div class="inbox-list-container">
+      <div *ngIf="isInboxLoading()" class="chat-loading-state">
+        <div class="spinner"></div>
+        <span>Loading inbox...</span>
+      </div>
+      
+      <!-- Loop over conversation inbox list -->
+      <div *ngFor="let item of inboxList()" 
+           class="inbox-item" 
+           [class.active]="activePartner()?.id === item.partnerId"
+           (click)="selectConversation(item)">
+        <div class="inbox-avatar">
+          {{ item.partnerName.charAt(0) }}
+        </div>
+        <div class="inbox-meta">
+          <div class="meta-row-top">
+            <span class="partner-name">
+              {{ item.partnerName }}
+              <span class="partner-biz-name" style="font-size: 0.82rem; font-weight: normal; opacity: 0.75;" *ngIf="item.partnerBusinessName">
+                ({{ item.partnerBusinessName }})
+              </span>
+            </span>
+            <span class="message-time">{{ item.lastMessageTime | date:'shortTime' }}</span>
+          </div>
+          <div class="meta-row-bottom">
+            <span class="last-msg-preview">{{ item.lastMessage }}</span>
+            <span class="badge badge-success unread-count-badge" *ngIf="item.unreadCount > 0">
+              {{ item.unreadCount }}
+            </span>
+          </div>
+          <div class="partner-role-badge" *ngIf="item.partnerRole">
+            {{ item.partnerRole }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="inboxList().length === 0 && !isInboxLoading()">
+        <p>No active chats found. Initiate a chat directly by clicking on "Book Service" or "Chat Now" from the Search results!</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- RIGHT PANEL: ACTIVE MESSAGES THREAD -->
+  <div class="chat-room-panel card">
+    
+    <ng-container *ngIf="activePartner(); else emptyChatState">
+      <!-- Chat Partner Header -->
+      <div class="chat-room-header">
+        <div class="partner-header-avatar">
+          {{ activePartner().name.charAt(0) }}
+        </div>
+        <div class="partner-header-info">
+          <h4>
+            {{ activePartner().name }}
+            <span class="partner-header-biz-name" style="font-size: 0.88rem; font-weight: normal; opacity: 0.85; margin-left: 6px;" *ngIf="activePartner().businessName">
+              ({{ activePartner().businessName }})
+            </span>
+          </h4>
+          <span class="partner-status" [class.typing]="chatService.isPartnerTyping()">
+            {{ chatService.isPartnerTyping() ? 'typing...' : 'Active Now' }}
+          </span>
+        </div>
+      </div>
+      
+      <!-- Messages Scroller -->
+      <div id="chat-scroll-container" class="chat-messages-container">
+        <div *ngIf="isHistoryLoading()" class="chat-loading-state">
+          <div class="spinner"></div>
+          <span>Loading messages history...</span>
+        </div>
+
+        <div *ngFor="let m of chatService.activeMessages()" 
+             class="msg-bubble-wrapper"
+             [class.msg-sent]="m.senderId === chatService.currentUser()?.id"
+             [class.msg-received]="m.senderId !== chatService.currentUser()?.id">
+          
+          <div class="msg-bubble">
+            <!-- Image Attachment (if any) -->
+            <div class="message-media-attachment" *ngIf="m.mediaUrl">
+              <img [src]="backendUrl + m.mediaUrl" alt="Shared photo" class="shared-chat-img" />
+            </div>
+
+            <!-- Text Message (if any) -->
+            <p class="message-text" *ngIf="m.messageText">{{ m.messageText }}</p>
+            
+            <!-- Message timestamp and status indicators -->
+            <div class="message-info">
+              <span class="msg-time">{{ m.createdAt | date:'shortTime' }}</span>
+              <span class="read-receipt" 
+                    *ngIf="m.senderId === chatService.currentUser()?.id"
+                    [class.is-read]="m.isRead">
+                ✓{{ m.isRead ? '✓' : '' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Typing Indicator Bubble -->
+        <div class="msg-bubble-wrapper msg-received" *ngIf="chatService.isPartnerTyping()">
+          <div class="msg-bubble typing-bubble">
+            <div class="typing-indicator-dots">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Media upload preview card (pre-sending state) -->
+      <div class="attachment-preview-container" *ngIf="imagePreview">
+        <div class="preview-card">
+          <img [src]="imagePreview" alt="Upload preview" />
+          <button (click)="clearFile()" class="remove-preview-btn">×</button>
+        </div>
+      </div>
+
+      <!-- Chat input controls -->
+      <div class="chat-input-controls">
+        <!-- Attachment trigger -->
+        <button (click)="fileInput.click()" class="btn btn-outline attachment-btn" title="Add photo">
+          📷
+        </button>
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
+        
+        <!-- Text Input box -->
+        <input type="text" 
+               [(ngModel)]="messageText" 
+               (ngModelChange)="onInputChange()"
+               (keyup.enter)="sendMsg()" 
+               placeholder="Type a message..." 
+               class="form-control chat-input" />
+        
+        <!-- Send button -->
+        <button (click)="sendMsg()" 
+                [disabled]="!messageText.trim() && !selectedFile" 
+                class="btn btn-primary send-msg-btn">
+          Send
+        </button>
+      </div>
+    </ng-container>
+    
+    <ng-template #emptyChatState>
+      <div class="empty-room-state">
+        <div class="illustration-chat">💬</div>
+        <h3>Select a Conversation</h3>
+        <p>Choose an active provider or customer from the left sidebar inbox to review messages history and start texting in real time.</p>
+      </div>
+    </ng-template>
+
+  </div>
+</div>
